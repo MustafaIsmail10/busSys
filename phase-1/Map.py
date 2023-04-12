@@ -3,6 +3,7 @@ from math import sqrt
 from uuid import uuid4
 import heapq
 
+
 class Map:
     def __init__(self, **kwargs):
         data = None
@@ -21,8 +22,6 @@ class Map:
         self.ways = {}
         for key in ws:
             self.ways[int(key)] = ws[key]
-
-
 
         # Parsing nodes
         ns = data["nodes"]
@@ -60,7 +59,6 @@ class Map:
         # uuid4 should be used in the final verison
         self.uids += 1
         return self.uids
-    
 
     def computeEdgeLength(self, edge):
         '''
@@ -72,14 +70,14 @@ class Map:
         totaltimeList = 0
         for i in range(1, len(ways)):
             p1 = ways[i]
-            totaltimeList += sqrt((p0["x"] - p1["x"])**2 + (p0["y"] - p1["y"])**2)
+            totaltimeList += sqrt((p0["x"] - p1["x"])
+                                  ** 2 + (p0["y"] - p1["y"])**2)
             p0 = p1
         return totaltimeList
 
-
-
     # Shotest path calculation start ******************************************
-    # This fuction takes a list contaning nodes and gives the min node as a result 
+    # This fuction takes a list contaning nodes and gives the min node as a result
+
     def getMinNode(self, notVisited, timeList):
         mintime = 1e31
         minNode = "-1"
@@ -87,9 +85,8 @@ class Map:
             if (timeList[n] < mintime):
                 mintime = timeList[n]
                 minNode = n
- 
-        return minNode
 
+        return minNode
 
     def getPath(self, parentLink, node):
         path = []
@@ -97,7 +94,7 @@ class Map:
             path.append(parentLink[node]["id"])
             if (node == parentLink[node]["from"]):
                 node = parentLink[node]["to"]
-            else : 
+            else:
                 node = parentLink[node]["from"]
         path.reverse()
         return path
@@ -109,8 +106,8 @@ class Map:
         for n in notVisited:
             if n == node1:
                 timeList[n] = 0
-                parentLink [n] = None
-            else : 
+                parentLink[n] = None
+            else:
                 timeList[n] = 1e30
         for i in range(len(notVisited)):
             node = self.getMinNode(notVisited, timeList)
@@ -123,8 +120,8 @@ class Map:
                     toNode = edge["to"]
 
                 if timeList[node] + edgeTime < timeList[toNode]:
-                        timeList[toNode] = timeList[node] + edgeTime 
-                        parentLink[toNode] = edge
+                    timeList[toNode] = timeList[node] + edgeTime
+                    parentLink[toNode] = edge
 
             notVisited.remove(node)
             if (node == node2):
@@ -132,22 +129,20 @@ class Map:
         return self.getPath(parentLink, node2)
     # Shotest path calculation end ******************************************
 
-    def closestedge(loc):
+    def closestedge(self, loc):
         pass
 
-    def addstop(edgeid, direction, percentage, description):
+    def addstop(self, edgeid, direction, percentage, description):
         pass
 
-    def delstop(stopid):
+    def delstop(self, stopid):
         pass
 
-    def getstop(stopid):
+    def getstop(self, stopid):
         pass
 
     def stoptimeListance(stop1, stop2):
         pass
-
-    
 
     def shorteststop(self, location):
         for stop in self.busStops:
@@ -156,7 +151,7 @@ class Map:
 
 def main():
     map = Map(path="../map.json")
-    path = map.shortest(7,19)
+    path = map.shortest(7, 19)
     print(path)
 
 
