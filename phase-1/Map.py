@@ -53,7 +53,7 @@ class Map:
                 self.nodes[newEdge["to"]]["edges"].append(edgeId)
 
         # Intializing bus stops
-        self.bus_stops = {}
+        self.busStops = {}
 
     # Generating unique id for each new item
     def getUID(self):
@@ -69,23 +69,23 @@ class Map:
         wayId = edge["way"]
         ways = self.ways[wayId]
         p0 = ways[0]
-        totalDist = 0
+        totaltimeList = 0
         for i in range(1, len(ways)):
             p1 = ways[i]
-            totalDist += sqrt((p0["x"] - p1["x"])**2 + (p0["y"] - p1["y"])**2)
+            totaltimeList += sqrt((p0["x"] - p1["x"])**2 + (p0["y"] - p1["y"])**2)
             p0 = p1
-        return totalDist
+        return totaltimeList
 
 
 
     # Shotest path calculation start ******************************************
     # This fuction takes a list contaning nodes and gives the min node as a result 
-    def getMinNode(self, notVisited, dist):
-        minDist = 1e31
+    def getMinNode(self, notVisited, timeList):
+        mintime = 1e31
         minNode = "-1"
         for n in notVisited:
-            if (dist[n] < minDist):
-                minDist = dist[n]
+            if (timeList[n] < mintime):
+                mintime = timeList[n]
                 minNode = n
  
         return minNode
@@ -105,24 +105,25 @@ class Map:
     def shortest(self, node1, node2):
         notVisited = [key for key in self.nodes]
         parentLink = {}
-        dist = {}
+        timeList = {}
         for n in notVisited:
             if n == node1:
-                dist[n] = 0
+                timeList[n] = 0
                 parentLink [n] = None
             else : 
-                dist[n] = 1e30
+                timeList[n] = 1e30
         for i in range(len(notVisited)):
-            node = self.getMinNode(notVisited, dist)
+            node = self.getMinNode(notVisited, timeList)
             for edgeId in self.nodes[node]["edges"]:
                 edge = self.edges[edgeId]
                 edgeLength = self.computeEdgeLength(edge)
+                edgeTime = edgeLength/edge["speed"]
                 toNode = edge["from"]
                 if edge["from"] == node:
                     toNode = edge["to"]
 
-                if dist[node] + edgeLength < dist[toNode]:
-                        dist[toNode] = dist[node] + edgeLength 
+                if timeList[node] + edgeTime < timeList[toNode]:
+                        timeList[toNode] = timeList[node] + edgeTime 
                         parentLink[toNode] = edge
 
             notVisited.remove(node)
@@ -143,11 +144,14 @@ class Map:
     def getstop(stopid):
         pass
 
-    def stopdistance(stop1, stop2):
+    def stoptimeListance(stop1, stop2):
         pass
 
-    def shorteststop(location):
-        pass
+    
+
+    def shorteststop(self, location):
+        for stop in self.busStops:
+            pass
 
 
 def main():
