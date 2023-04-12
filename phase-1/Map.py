@@ -182,16 +182,6 @@ if __name__ == "__main__":
 #     },
 # }
 
-
-# ways = {
-#     0: {
-#         "cordiantes": [],
-#         "edge": 54,
-#         "length":[],
-#     },
-#     }
-
-
 #  "ways": {
 #     "0": [
 #       {
@@ -209,10 +199,8 @@ if __name__ == "__main__":
 # stops = {
 #     0:{
 #         "edge":55,
-#         "cordinates": 50,
 #         "direction": True,
 #         "percnetage":50,
-#         "description":50
-
+#         "description":"Description of the bus stop"
 #     }
 # }
