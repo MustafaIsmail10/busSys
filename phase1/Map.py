@@ -284,13 +284,13 @@ class Map:
         )
         return ret  # format or just return the stop dictionary?
 
+    ##******************************Review the following parts********************************########
     def stoptimeDistance(self, stop1, stop2):
         s1 = self.busStops[stop1]
         s2 = self.busStops[stop2]
         if s1["direction"]:
             target_node = self.edges[s1["edge"]]["to"]
             way1 = self.ways[self.edges[s1["edge"]]["way"]]
-
         else:
             target_node = self.edges[s1["edge"]]["from"]
             way1 = self.ways[self.edges[s1["edge"]]["way"]].copy().reverse()
