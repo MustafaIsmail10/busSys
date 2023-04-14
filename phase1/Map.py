@@ -329,9 +329,18 @@ class Map:
         )
         return (fullDistance, time)
 
+    
     def shorteststop(self, location):
+        """
+        Takes a location and returns the id of the closet stop to that location and returns None in case there is no stops
+        """
+        min_dist = 1e30
+        min_stop = None
         for stop in self.busStops:
-            pass
+            temp_dist = self.dist (self.busStops[stop]["location"], location)
+            if temp_dist < min_dist:
+                min_stop = stop
+        return min_stop
 
 
 def main():
@@ -385,5 +394,6 @@ if __name__ == "__main__":
 #         "direction": True,
 #         "percnetage":50,
 #         "description":"Description of the bus stop"
+#         "locatoin": {"x":1215, "y"=44}
 #     }
 # }
