@@ -111,7 +111,7 @@ class Map:
         path_length = 0
         path_time = 0
         for p in path:
-            p_length = self.compute_edge_length(self.edges[p]) /100
+            p_length = self.compute_edge_length(self.edges[p]) / 100
             p_time = path_length / self.edges[p]["speed"]
             path_length += p_length
             path_time += p_time
@@ -135,7 +135,7 @@ class Map:
             node = self.__get_min_node(notVisited, time_list)
             for edge_id in self.nodes[node]["edges"]:
                 edge = self.edges[edge_id]
-                edge_length = self.compute_edge_length(edge) /100 
+                edge_length = self.compute_edge_length(edge) / 100
                 edge_time = edge_length / edge["speed"]
                 toNode = edge["from"]
                 if edge["from"] == node:
@@ -153,20 +153,167 @@ class Map:
 
     # Shotest path calculation end ******************************************
 
-    def closestedge(self, loc):
-        pass
+    def dotprod(self, a, b):
+        product = a["x"] * b["x"]
+        product += a["y"] * b["y"]
+        return product
+
+    def subtract(self, a, b):
+        c = {}
+        c["x"] = a["x"] - b["x"]
+        c["y"] = a["y"] - b["y"]
+        return c
+
+    def add(self, a, b):
+        c = {}
+        c["x"] = a["x"] + b["x"]
+        c["y"] = a["y"] + b["y"]
+        return c
+
+    def multiply(self, cons, a):
+        c = {}
+        c["x"] = cons * a["x"]
+        c["y"] = cons * a["y"]
+        return c
+
+    def dist(self, a, b):
+        return sqrt((a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2)
+
+    def closestedge(
+        self, loc
+    ):  # instead of storing all these can we set a min and calculate on the fly
+        allpoints = {}
+        distances = {}
+        points = []
+        closest_point = None
+        min_dist = 10000  # change later to inf
+        for edge in self.edges:
+            way = self.ways[self.edges[edge]["way"]]
+            a = way[0]
+            for i in range(1, len(way)):
+                b = way[i]
+                xa = self.subtract(loc, a)
+                ba = self.subtract(b, a)
+                d = self.dotprod(xa, ba) / self.dotprod(ba, ba)
+                if d <= 0:
+                    point = a
+                elif d >= 1:
+                    point = b
+                else:
+                    point = self.add(a, self.multiply(d, ba))
+                distance = self.dist(point, loc)
+                if distance < min_dist:
+                    min_dist = distance
+                    closest_point = point
+                    closest_edge = edge
+                    closest_way = way
+                a = b
+
+        percentage = self.dist(
+            self.nodes[self.edges[closest_edge]["from"]]["location"], closest_point
+        ) / self.computeEdgeLength(self.edges[closest_edge])
+        return (closest_edge, closest_point, percentage)
 
     def addstop(self, edgeid, direction, percentage, description):
-        pass
+        factor = (percentage * self.computeEdgeLength(self.edges[edgeid])) / 100
+
+        way = self.ways[self.edges[edgeid]["way"]]
+        if not direction:
+            way = self.ways[self.edges[edgeid]["way"]].copy().reverse()
+        node1 = way[0]
+        for i in range(1, len(way)):
+            node2 = way[i]
+            way_distance = self.dist(node1, node2)
+            if way_distance > factor:
+                coordinate = self.mult(
+                    1 + (factor / way_distance), node1
+                )  # are there edge cases such as node1 coord bigger than node2
+                between = (node1, node2)
+                break
+            node1 = node2
+            factor -= way_distance
+
+        self.stopIds += 1  # replace with uids()
+        self.busStops[self.stopIds] = {}
+        self.busStops[self.stopIds]["loc"] = coordinate
+        self.busStops[self.stopIds]["direction"] = direction
+        self.busStops[self.stopIds]["description"] = description
+        self.busStops[self.stopIds]["edge"] = edgeid
+        self.busStops[self.stopIds]["percent"] = percentage
+        self.edges[edgeid]["stops"].append(self.stopIds)
+
+        return self.busStops[self.stopIds]
 
     def delstop(self, stopid):
-        pass
+        if self.stopIds == 0:
+            raise Exception("no more stops to delete!")
+        if stopid > self.stopIds:
+            raise Exception("no such stop to delete!")
+        edgeid = self.busStops[stopid]["edge"]
+        del self.busStops[stopid]
+
+        self.edges[edgeid]["stops"].remove(self.stopIds)
+        self.stopIds -= 1
+        return "successful deletion"
 
     def getstop(self, stopid):
-        pass
+        if self.stopIds == 0 or stopid > self.stopIds:
+            raise Exception("no such stop!")
+        stop = self.busStops[stopid]
+        edge = self.edges[stop["edge"]]  # frm and to depend on direction
+        ret = "This is {name} stop of id {id}. It connects nodes {frm} to {to} through edge {edgeid}".format(
+            name=stop["description"],
+            id=stopid,
+            frm=edge["from"],
+            to=edge["to"],
+            edgeid=stop["edge"],
+        )
+        return ret  # format or just return the stop dictionary?
 
-    def stoptimeListance(stop1, stop2):
-        pass
+    def stoptimeDistance(self, stop1, stop2):
+        s1 = self.busStops[stop1]
+        s2 = self.busStops[stop2]
+        if s1["direction"]:
+            target_node = self.edges[s1["edge"]]["to"]
+            way1 = self.ways[self.edges[s1["edge"]]["way"]]
+
+        else:
+            target_node = self.edges[s1["edge"]]["from"]
+            way1 = self.ways[self.edges[s1["edge"]]["way"]].copy().reverse()
+
+        if s2["direction"]:
+            src_node = self.edges[s2["edge"]]["from"]
+            way2 = self.ways[self.edges[s2["edge"]]["way"]]
+
+        else:
+            src_node = self.edges[s2["edge"]]["to"]
+            way2 = self.ways[self.edges[s2["edge"]]["way"]].copy().reverse()
+
+        factor1 = s1["percent"] * self.computeEdgeLength(s1["edge"])
+        factor2 = s2["percent"] * self.computeEdgeLength(s2["edge"])
+        node1 = way1[0]
+        dist1 = dist2 = 0
+        for i in range(1, len(way1)):
+            node2 = way1[i]
+            if self.dist(node1, node2) > factor1:
+                dist1 += self.dist(s1["loc"], node1)
+                break
+            dist1 += self.dist(node1, node2)
+
+        node1 = way2[0]
+        for i in range(1, len(way1)):
+            node2 = way2[i]
+            if self.dist(node1, node2) > factor2:
+                dist2 += self.dist(s2["loc"], node1)
+                break
+            dist2 += self.dist(node1, node2)
+
+        shortestDist = self.shortest(target_node, src_node)
+        fullDistance = shortestDist[0] + dist1 + dist2
+        time = (
+            shortestDist[1] + dist1 / s1["edge"]["speed"] + dist2 / s2["edge"]["speed"]
+        )
+        return (fullDistance, time)
 
     def shorteststop(self, location):
         for stop in self.busStops:
