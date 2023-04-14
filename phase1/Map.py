@@ -1,5 +1,5 @@
 import json
-from math import sqrt
+from math import sqrt, sin, cos
 from uuid import uuid4
 import heapq
 import utilities
@@ -120,17 +120,28 @@ class Map:
     def shortest(self, node1, node2):
         """
         Implementing dijkstra algorithm
+        It takes the id of 2 nodes as input
+        It returns a tuple of 3 (edgeid, distace in meters, time in minutes)
 
         """
+        # I'm using a list to store non visited nodes and getting and using a dictionary to store values for each edge
         notVisited = [key for key in self.nodes]
         parent_link = {}
         time_list = {}
+        # Intializing the non visited list
         for n in notVisited:
             if n == node1:
                 time_list[n] = 0
                 parent_link[n] = None
             else:
                 time_list[n] = 1e30
+
+        # The real work is here
+        # get the minimum node
+        # process its edges and update thier weight in time list
+        # store the edges that let to the current node
+        # until the wanted node is reached
+        # find the edges that let to it to get the path to that node
         for i in range(len(notVisited)):
             node = self.__get_min_node(notVisited, time_list)
             for edge_id in self.nodes[node]["edges"]:
@@ -189,6 +200,7 @@ class Map:
         min_dist = 10000  # change later to inf
         for edge in self.edges:
             way = self.ways[self.edges[edge]["way"]]
+
             a = way[0]
             for i in range(1, len(way)):
                 b = way[i]
@@ -206,16 +218,17 @@ class Map:
                     min_dist = distance
                     closest_point = point
                     closest_edge = edge
-                    closest_way = way
+                    # we can store the way index of the edge in the stops to make it easier to track the stops 
+                    closest_way = i
                 a = b
 
         percentage = self.dist(
             self.nodes[self.edges[closest_edge]["from"]]["location"], closest_point
-        ) / self.computeEdgeLength(self.edges[closest_edge])
-        return (closest_edge, closest_point, percentage)
+        ) / self.compute_edge_length(self.edges[closest_edge]) # can be handled better by using closet way, edge , and point cordinates
+        return (closest_edge, closest_point, percentage) # would it make a difference using the edge id instead of the edge
 
     def addstop(self, edgeid, direction, percentage, description):
-        factor = (percentage * self.computeEdgeLength(self.edges[edgeid])) / 100
+        factor = (percentage * self.compute_edge_length(self.edges[edgeid])) / 100
 
         way = self.ways[self.edges[edgeid]["way"]]
         if not direction:
@@ -225,9 +238,11 @@ class Map:
             node2 = way[i]
             way_distance = self.dist(node1, node2)
             if way_distance > factor:
-                coordinate = self.mult(
-                    1 + (factor / way_distance), node1
+
+                temp = self.mult(
+                    (factor / way_distance), self.subtract(node2, node1)
                 )  # are there edge cases such as node1 coord bigger than node2
+                coordinate = self.add(node1, temp)
                 between = (node1, node2)
                 break
             node1 = node2
@@ -251,7 +266,6 @@ class Map:
             raise Exception("no such stop to delete!")
         edgeid = self.busStops[stopid]["edge"]
         del self.busStops[stopid]
-
         self.edges[edgeid]["stops"].remove(self.stopIds)
         self.stopIds -= 1
         return "successful deletion"
@@ -289,8 +303,8 @@ class Map:
             src_node = self.edges[s2["edge"]]["to"]
             way2 = self.ways[self.edges[s2["edge"]]["way"]].copy().reverse()
 
-        factor1 = s1["percent"] * self.computeEdgeLength(s1["edge"])
-        factor2 = s2["percent"] * self.computeEdgeLength(s2["edge"])
+        factor1 = s1["percent"] * self.compute_edge_length(s1["edge"])
+        factor2 = s2["percent"] * self.compute_edge_length(s2["edge"])
         node1 = way1[0]
         dist1 = dist2 = 0
         for i in range(1, len(way1)):
@@ -324,6 +338,7 @@ def main():
     map = Map(path="../map.json")
     path = map.shortest(7, 19)
     print(path)
+    print(map.edges)
     l = map.compute_edge_length(edge=map.edges[1])
     print(l)
 
