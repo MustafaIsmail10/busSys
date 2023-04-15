@@ -3,10 +3,10 @@ from math import sqrt, sin, cos
 from uuid import uuid4
 import heapq
 import utilities
+from Stop import Stop
 
 
 class Map:
-
     def __init__(self, **kwargs):
         """
         Map class constructor which takes a json file
@@ -219,9 +219,10 @@ class Map:
                 a = b
 
         percentage = self.dist(
-            self.nodes[self.edges[closest_edge]
-                       ["from"]]["location"], closest_point
-        ) / self.compute_edge_length(self.edges[closest_edge])  # can be handled better by using closet way, edge , and point cordinates
+            self.nodes[self.edges[closest_edge]["from"]]["location"], closest_point
+        ) / self.compute_edge_length(
+            self.edges[closest_edge]
+        )  # can be handled better by using closet way, edge , and point cordinates
         # would it make a difference using the edge id instead of the edge
         return (closest_edge, closest_point, percentage)
 
@@ -230,8 +231,7 @@ class Map:
         if not direction:
             pe = 100 - percentage
 
-        factor = (
-            pe * self.compute_edge_length(self.edges[edgeid])) / 100
+        factor = (pe * self.compute_edge_length(self.edges[edgeid])) / 100
 
         way = self.ways[self.edges[edgeid]["way"]]
         node1 = way[0]
@@ -239,7 +239,6 @@ class Map:
             node2 = way[i]
             way_distance = self.dist(node1, node2)
             if way_distance >= factor:
-
                 temp = self.multiply(
                     (factor / way_distance), self.subtract(node2, node1)
                 )  # are there edge cases such as node1 coord bigger than node2
@@ -249,73 +248,86 @@ class Map:
             factor -= way_distance
 
         self.stopIds += 1  # replace with uids()
-        self.bus_stops[self.stopIds] = {}
-        self.bus_stops[self.stopIds]["loc"] = coordinate
-        self.bus_stops[self.stopIds]["direction"] = direction
-        self.bus_stops[self.stopIds]["description"] = description
-        self.bus_stops[self.stopIds]["edge"] = edgeid
-        self.bus_stops[self.stopIds]["percent"] = percentage
-        self.edges[edgeid]["stops"].append(self.stopIds)
+        stop = Stop(
+            self.stopIds, edgeid, percentage, direction, description, coordinate
+        )
+        self.bus_stops[self.stopIds] = stop
+        # self.bus_stops[self.stopIds] = {}
+        # self.bus_stops[self.stopIds]["loc"] = coordinate
+        # self.bus_stops[self.stopIds]["direction"] = direction
+        # self.bus_stops[self.stopIds]["description"] = description
+        # self.bus_stops[self.stopIds]["edge"] = edgeid
+        # self.bus_stops[self.stopIds]["percent"] = percentage
+        # self.edges[edgeid]["stops"].append(self.stopIds)
         return self.stopIds
 
     def delstop(self, stopid):
         if self.stopIds == 0:
             raise Exception("no more stops to delete!")
-        if stopid > self.stopIds:
+        if stopid > self.stopIds or stopid not in self.bus_stops:
             raise Exception("no such stop to delete!")
-        edgeid = self.bus_stops[stopid]["edge"]
+
+        edgeid = self.bus_stops[stopid].get_edgeid()
         del self.bus_stops[stopid]
-        self.edges[edgeid]["stops"].remove(self.stopIds)
-        self.stopIds -= 1
+        self.edges[edgeid]["stops"].remove(stopid)
         return "successful deletion"
 
     def getstop(self, stopid):
-        if self.stopIds == 0 or stopid > self.stopIds:
+        if self.stopIds == 0 or stopid > self.stopIds or stopid not in self.bus_stops:
             raise Exception("no such stop!")
+
         stop = self.bus_stops[stopid]
-        edge = self.edges[stop["edge"]]  # frm and to depend on direction
-        ret = "This is {name} stop of id {id}. It connects nodes {frm} to {to} through edge {edgeid}".format(
-            name=stop["description"],
-            id=stopid,
-            frm=edge["from"],
-            to=edge["to"],
-            edgeid=stop["edge"],
-        )
-        return ret  # format or just return the stop dictionary?
+        # edge = self.edges[stop.get_edgeid()]  # frm and to depend on direction
+        # ret = "This is {name} stop of id {id}. It connects nodes {frm} to {to} through edge {edgeid}".format(
+        #     name=stop.description,
+        #     id=stopid,
+        #     frm=edge["from"],
+        #     to=edge["to"],
+        #     edgeid=stop["edge"],
+        # )
+        return stop  # format or just return the stop dictionary?
 
     ## ******************************Review the following parts********************************########
     def stoptimeDistance(self, stop1: int, stop2: int):
+        if stop1 not in self.bus_stops:
+            raise Exception("stop1 unavailable")
+        if stop2 not in self.bus_stops:
+            raise Exception("stop2 unavailable")
+
         s1 = self.bus_stops[stop1]
         s2 = self.bus_stops[stop2]
         if s1["direction"]:
-            target_node = self.edges[s1["edge"]]["to"]
-            factor1 = (100 - s1["percent"]) / 100
-            dist_to_target = factor1 * \
-                self.compute_edge_length(self.edges[s1["edge"]])
+            target_node = self.edges[s1.get_edgeid()]["to"]
+            factor1 = (100 - s1.get_percent()) / 100
+            dist_to_target = factor1 * self.compute_edge_length(
+                self.edges[s1.get_edgeid()]
+            )
         else:
-            target_node = self.edges[s1["edge"]]["from"]
-            factor1 = (s1["percent"]) / 100
-            dist_to_target = factor1 * \
-                self.compute_edge_length(self.edges[s1["edge"]])
+            target_node = self.edges[s1.get_edgeid()]["from"]
+            factor1 = (s1.get_percent()) / 100
+            dist_to_target = factor1 * self.compute_edge_length(
+                self.edges[s1.get_edgeid()]
+            )
 
         if s2["direction"]:
-            src_node = self.edges[s2["edge"]]["from"]
-            factor2 = (s2["percent"]) / 100
-            dist_from_src = factor2 * \
-                self.compute_edge_length(self.edges[s2["edge"]])
+            src_node = self.edges[s2.get_edgeid()]["from"]
+            factor2 = (s2.get_percent()) / 100
+            dist_from_src = factor2 * self.compute_edge_length(
+                self.edges[s2.get_edgeid()]
+            )
 
         else:
-            src_node = self.edges[s2["edge"]]["to"]
-            factor2 = (100-s2["percent"]) / 100
-            dist_from_src = factor2 * \
-                self.compute_edge_length(self.edges[s2["edge"]])
+            src_node = self.edges[s2.get_edgeid()]["to"]
+            factor2 = (100 - s2.get_percent()) / 100
+            dist_from_src = factor2 * self.compute_edge_length(
+                self.edges[s2.get_edgeid()]
+            )
 
         shortest_between_nodes = self.shortest(target_node, src_node)
 
-        path_length = shortest_between_nodes[1] + \
-            dist_from_src + dist_to_target
-        time_to_target = dist_to_target/self.edges[s1["edge"]]["speed"]
-        time_form_src = dist_from_src/self.edges[s2["edge"]]["speed"]
+        path_length = shortest_between_nodes[1] + dist_from_src + dist_to_target
+        time_to_target = dist_to_target / self.edges[s1.get_edgeid()]["speed"]
+        time_form_src = dist_from_src / self.edges[s2.get_edgeid()]["speed"]
         path_time = shortest_between_nodes[2] + time_form_src + time_to_target
         return (path_length, path_time)
 
@@ -326,13 +338,11 @@ class Map:
         min_dist = 1e30
         min_stop = None
         for stop in self.bus_stops:
-            temp_dist = self.dist(self.bus_stops[stop]["location"], location)
+            temp_dist = self.dist(self.bus_stops[stop].get_location(), location)
             if temp_dist < min_dist:
                 min_stop = stop
+                min_dist = temp_dist
         return min_stop
-
-    def print_stops(self):
-        print(self.bus_stops)
 
 
 def main():
@@ -342,7 +352,7 @@ def main():
     print(map.edges)
     # l = map.compute_edge_length(edge=map.edges[1])
     # print(l)
-    print(map.shortest(1,2))
+    print(map.shortest(1, 2))
 
 
 if __name__ == "__main__":

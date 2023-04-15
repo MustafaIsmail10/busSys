@@ -48,10 +48,10 @@ class Schedule:
         del self.lines[line_id]
         
 
-    def lineinfo():
+    def lineinfo(self):
         pass
 
-    def stopinfo():  # which lines pass by it and when
+    def stopinfo(self):  # which lines pass by it and when
         pass
 
 

@@ -31,7 +31,7 @@ class Route:
     def change_wait(self,stopid, new_wait):
         self.stops[stopid] =  new_wait
  
-    def get_route(self):
+    def get_stops(self):
         first = self.orderedStops[0]
         route = []
         route.append((first,0,self.stops[first])) # stopid, starttime, leavetime
