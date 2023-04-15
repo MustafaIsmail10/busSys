@@ -1,5 +1,6 @@
 import math
 from Route import Route
+from Stop import Stop
 
 class Line:
 
@@ -16,6 +17,8 @@ class Line:
         self.id = lineid  # id must be generated for each line
         self.description = description
 
+
+
     def get_bus_num(self):
         trip_time = self.route.get_time()
         return math.ceil(trip_time/self.time_between_trips)
@@ -29,7 +32,7 @@ class Line:
     
 
     def get_stop_pass_times(self, stopid):
-        stops = self.route.get_stops()
+        stops = self.route.get_stops_data()
         passing_time_from_start = None
         passing_times = []
         for stop in stops:

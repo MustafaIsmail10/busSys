@@ -10,7 +10,6 @@ class Stop:
         self.direction = direction  # boolean value
         self.description = description  # string description of the stop
         self.loc = loc  # dictionary representing location of the stop
-        self.lines = []  # list of lines in which the stop exist
 
     def get_stopid(self):
         return self.stopid
