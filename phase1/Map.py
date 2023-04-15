@@ -6,15 +6,20 @@ import utilities
 
 
 class Map:
+
     def __init__(self, **kwargs):
         """
         Map class constructor which takes a json file
         or json string containing the data of the map as input
         """
+        self.uids = 0  # is here for debugging purposes
+        self.stopIds = 0
+
+        # Intializing bus stops
+        self.bus_stops = {}
 
         # Loading the data and parsing it into a python dictionary
         data = None
-        self.uids = 0  # is here for debugging purposes
         if "path" in kwargs.keys():
             with open(kwargs["path"], "r") as file:
                 data = json.load(file)
@@ -57,9 +62,6 @@ class Map:
                 self.edges[edgeId] = newEdge
                 self.nodes[newKey]["edges"].append(edgeId)
                 self.nodes[newEdge["to"]]["edges"].append(edgeId)
-
-        # Intializing bus stops
-        self.busStops = {}
 
     # Generating unique id for each new item
     def get_uid(self):
@@ -190,17 +192,11 @@ class Map:
     def dist(self, a, b):
         return sqrt((a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2)
 
-    def closestedge(
-        self, loc
-    ):  # instead of storing all these can we set a min and calculate on the fly
-        allpoints = {}
-        distances = {}
-        points = []
+    def closestedge(self, loc):
         closest_point = None
-        min_dist = 10000  # change later to inf
+        min_dist = 1e30  # change later to inf
         for edge in self.edges:
             way = self.ways[self.edges[edge]["way"]]
-
             a = way[0]
             for i in range(1, len(way)):
                 b = way[i]
@@ -219,7 +215,7 @@ class Map:
                     closest_point = point
                     closest_edge = edge
                     # we can store the way index of the edge in the stops to make it easier to track the stops
-                    closest_way = i
+                    # closest_way = i
                 a = b
 
         percentage = self.dist(
@@ -230,45 +226,45 @@ class Map:
         return (closest_edge, closest_point, percentage)
 
     def addstop(self, edgeid, direction, percentage, description):
+        pe = percentage
+        if not direction:
+            pe = 100 - percentage
+
         factor = (
-            percentage * self.compute_edge_length(self.edges[edgeid])) / 100
+            pe * self.compute_edge_length(self.edges[edgeid])) / 100
 
         way = self.ways[self.edges[edgeid]["way"]]
-        if not direction:
-            way = self.ways[self.edges[edgeid]["way"]].copy().reverse()
         node1 = way[0]
         for i in range(1, len(way)):
             node2 = way[i]
             way_distance = self.dist(node1, node2)
-            if way_distance > factor:
+            if way_distance >= factor:
 
-                temp = self.mult(
+                temp = self.multiply(
                     (factor / way_distance), self.subtract(node2, node1)
                 )  # are there edge cases such as node1 coord bigger than node2
                 coordinate = self.add(node1, temp)
-                between = (node1, node2)
                 break
             node1 = node2
             factor -= way_distance
 
         self.stopIds += 1  # replace with uids()
-        self.busStops[self.stopIds] = {}
-        self.busStops[self.stopIds]["loc"] = coordinate
-        self.busStops[self.stopIds]["direction"] = direction
-        self.busStops[self.stopIds]["description"] = description
-        self.busStops[self.stopIds]["edge"] = edgeid
-        self.busStops[self.stopIds]["percent"] = percentage
+        self.bus_stops[self.stopIds] = {}
+        self.bus_stops[self.stopIds]["loc"] = coordinate
+        self.bus_stops[self.stopIds]["direction"] = direction
+        self.bus_stops[self.stopIds]["description"] = description
+        self.bus_stops[self.stopIds]["edge"] = edgeid
+        self.bus_stops[self.stopIds]["percent"] = percentage
         self.edges[edgeid]["stops"].append(self.stopIds)
-
-        return self.busStops[self.stopIds]
+        return self.stopIds
 
     def delstop(self, stopid):
         if self.stopIds == 0:
             raise Exception("no more stops to delete!")
         if stopid > self.stopIds:
             raise Exception("no such stop to delete!")
-        edgeid = self.busStops[stopid]["edge"]
-        del self.busStops[stopid]
+        edgeid = self.bus_stops[stopid]["edge"]
+        del self.bus_stops[stopid]
         self.edges[edgeid]["stops"].remove(self.stopIds)
         self.stopIds -= 1
         return "successful deletion"
@@ -276,7 +272,7 @@ class Map:
     def getstop(self, stopid):
         if self.stopIds == 0 or stopid > self.stopIds:
             raise Exception("no such stop!")
-        stop = self.busStops[stopid]
+        stop = self.bus_stops[stopid]
         edge = self.edges[stop["edge"]]  # frm and to depend on direction
         ret = "This is {name} stop of id {id}. It connects nodes {frm} to {to} through edge {edgeid}".format(
             name=stop["description"],
@@ -289,8 +285,8 @@ class Map:
 
     ## ******************************Review the following parts********************************########
     def stoptimeDistance(self, stop1: int, stop2: int):
-        s1 = self.busStops[stop1]
-        s2 = self.busStops[stop2]
+        s1 = self.bus_stops[stop1]
+        s2 = self.bus_stops[stop2]
         if s1["direction"]:
             target_node = self.edges[s1["edge"]]["to"]
             factor1 = (100 - s1["percent"]) / 100
@@ -329,20 +325,23 @@ class Map:
         """
         min_dist = 1e30
         min_stop = None
-        for stop in self.busStops:
-            temp_dist = self.dist(self.busStops[stop]["location"], location)
+        for stop in self.bus_stops:
+            temp_dist = self.dist(self.bus_stops[stop]["location"], location)
             if temp_dist < min_dist:
                 min_stop = stop
         return min_stop
+
+    def print_stops(self):
+        print(self.bus_stops)
 
 
 def main():
     map = Map(path="./test/test_map.json")
     path = map.shortest(1, 2)
-    print(path)
+    # print(path)
     print(map.edges)
-    l = map.compute_edge_length(edge=map.edges[1])
-    print(l)
+    # l = map.compute_edge_length(edge=map.edges[1])
+    # print(l)
 
 
 if __name__ == "__main__":

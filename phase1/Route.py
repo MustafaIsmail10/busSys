@@ -1,11 +1,11 @@
 import Map
 
 class Route:
-    def __init__(self,map:Map):
+    def __init__(self,mmap:Map):
         self.orderedStops = [] 
         self.stops = {} #id and wait time
         self.start = -1
-        self.map = map
+        self.map = mmap
     
     def add_stop(self,stopid,wait):
         if len(self.orderedStops)==0:
@@ -37,12 +37,12 @@ class Route:
         route.append((first,0,self.stops[first])) # stopid, starttime, leavetime
         for i in range(1,len(self.orderedStops)): 
             second = self.orderedStops[i]
-            result = map.stoptimeDistance(first,second)
+            result = self.map.stoptimeDistance(first,second)
             arrive = result[1] + route[i-1][2] # travel time + previous stop leave time
             leave = arrive +  self.stops[second] #add wait time
             route.append((second,arrive,leave))
             first = second
-        last_trip = map.stoptimeDistance(self.orderedStops[-1],self.orderedStops[0])
+        last_trip = self.map.stoptimeDistance(self.orderedStops[-1],self.orderedStops[0])
         arrive = last_trip[1] + route[-1][2]
         route.append((self.orderedStops[0],arrive))
         return route
