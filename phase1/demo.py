@@ -19,6 +19,34 @@ class Sys(cmd.Cmd):
         user.login()
         Sys.schedule = busSys.get_schedule(user)
 
+        # Adding push of routes and stops to test with
+        Sys.schedule.add_stop(1, True, 50, "Hola")
+        Sys.schedule.add_stop(2, True, 50, "Hola")
+        Sys.schedule.add_stop(3, True, 50, "Hola")
+        Sys.schedule.add_stop(4, True, 50, "Hola")
+        Sys.schedule.add_stop(5, True, 50, "Hola")
+        Sys.schedule.add_stop(6, True, 50, "Hola")
+
+
+        Sys.schedule.add_route()
+        Sys.schedule.add_route()
+        Sys.schedule.add_route()
+
+        Sys.schedule.add_stop_to_route(1, 1, 5)
+        Sys.schedule.add_stop_to_route(1, 2, 5)
+        Sys.schedule.add_stop_to_route(1, 4, 5)
+        Sys.schedule.add_stop_to_route(1, 5, 5)
+
+        Sys.schedule.add_stop_to_route(2, 1, 5)
+        Sys.schedule.add_stop_to_route(2, 5, 5)
+        Sys.schedule.add_stop_to_route(2, 4, 5)
+        Sys.schedule.add_stop_to_route(2, 2, 5)
+
+        Sys.schedule.add_stop_to_route(3, 2, 5)
+        Sys.schedule.add_stop_to_route(3, 4, 5)
+        Sys.schedule.add_stop_to_route(3, 3, 5)
+
+
     def do_map_test(self, args):
         print("Tesing map Functionalities")
         temp = my_map.shortest(1, 2)
@@ -36,6 +64,27 @@ class Sys(cmd.Cmd):
     def do_add_stop(self, args):
         ar = args.split(" ")
         Sys.schedule.add_stop(int(ar[0]), bool(ar[1]), int(ar[2]), ar[3])
+
+    def do_add_route(self, args):
+        new_route_id = Sys.schedule.add_route()
+        print(f"The new route id is {new_route_id}")
+
+    def do_print_route_info(self, args):
+        route = Sys.schedule.get_route(int(args))
+        print(route)
+
+    def do_print_all_routes(self, args):
+        routes = Sys.schedule.get_routes()
+        for route in routes:
+            print(routes[route])
+
+    def do_add_stop_to_route (self, args):
+        ar = args.split(" ")
+        Sys.schedule.add_stop_to_route(int(ar[0]),int(ar[1]), int(ar[2]))
+
+    def do_remove_stop(self, args):
+        Sys.schedule.remove_stop(int(args))
+
 
 
 if __name__ == "__main__":

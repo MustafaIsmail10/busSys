@@ -258,7 +258,7 @@ class Map:
         # self.bus_stops[self.stopIds]["description"] = description
         # self.bus_stops[self.stopIds]["edge"] = edgeid
         # self.bus_stops[self.stopIds]["percent"] = percentage
-        # self.edges[edgeid]["stops"].append(self.stopIds)
+        self.edges[edgeid]["stops"].append(self.stopIds)
         return self.stopIds
 
     def delstop(self, stopid):
@@ -296,7 +296,7 @@ class Map:
 
         s1 = self.bus_stops[stop1]
         s2 = self.bus_stops[stop2]
-        if s1["direction"]:
+        if s1.get_direction():
             target_node = self.edges[s1.get_edgeid()]["to"]
             factor1 = (100 - s1.get_percent()) / 100
             dist_to_target = factor1 * self.compute_edge_length(
@@ -309,7 +309,7 @@ class Map:
                 self.edges[s1.get_edgeid()]
             )
 
-        if s2["direction"]:
+        if s2.get_direction():
             src_node = self.edges[s2.get_edgeid()]["from"]
             factor2 = (s2.get_percent()) / 100
             dist_from_src = factor2 * self.compute_edge_length(

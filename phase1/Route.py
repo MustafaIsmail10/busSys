@@ -2,17 +2,23 @@ import Map
 
 
 class Route:
-    def __init__(self, mmap: Map):
+    def __init__(self, mmap: Map, routeid):
         self.orderedStops = []
         self.stops = {}  # id and wait time
         self.start = -1
         self.map = mmap
+        self.id = routeid
 
     def add_stop(self, stopid, wait):
         if len(self.orderedStops) == 0:
             self.start = stopid
         self.orderedStops.append(stopid)
         self.stops[stopid] = wait
+
+    def del_stop(self, stopid):
+        if stopid in self.stops:
+            del self.stops[stopid]
+            self.orderedStops.remove(stopid)
 
     def change_stop_order(self, new_index, stopid):
         if new_index == 0:
@@ -32,6 +38,8 @@ class Route:
         self.stops[stopid] = new_wait
 
     def get_stops_data(self):
+        if self.orderedStops == []:
+            return []
         first = self.orderedStops[0]
         route = []
         route.append((first, 0, self.stops[first]))  # stopid, starttime, leavetime
@@ -70,3 +78,8 @@ class Route:
 
     def get_stops(self):
         return self.stops
+    
+
+    def __str__(self) -> str:
+        return f"routeid: {self.id}, stops: {self.get_stops_data()}"
+

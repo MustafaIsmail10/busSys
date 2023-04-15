@@ -12,11 +12,20 @@ class Schedule:
         self.line_count = 0
 
     def add_route(self):
-        new_route = Route(self.map)
         self.route_count += 1
         new_route_id = self.route_count
+        new_route = Route(self.map, new_route_id)
         self.routes[new_route_id] = new_route
         return new_route_id
+    
+    def get_route(self, routeid):
+        return self.routes[routeid]
+    
+    def get_route_info(self, route_id):
+        return self.routes[route_id].get_stops()
+    
+    def get_routes(self):
+        return self.routes
 
     def get_stops(self):
         return self.map.bus_stops
@@ -27,12 +36,12 @@ class Schedule:
 
     def remove_stop(self, stop_id):
         self.map.delstop(stop_id)
+        for r in self.routes:
+            self.routes[r].del_stop(stop_id)
 
     def add_stop_to_route(self, route_id, stop_id, wait_time):
-        self.routes[route_id].add_stop(stop_id, wait_time)
+        self.routes[route_id].add_stop(stop_id, wait_time)    
 
-    def get_route_info(self, route_id):
-        return self.routes[route_id].get_route()
 
     def change_stop_wait(self, route_id, stop_id, wait):
         self.routes[route_id].change_wait(stop_id, wait)
@@ -48,11 +57,15 @@ class Schedule:
         del self.lines[line_id]
         
 
-    def lineinfo(self):
+    def lineinfo(self, lineid):
         pass
 
-    def stopinfo(self):  # which lines pass by it and when
-        pass
+    def stopinfo(self, stopid):  # which lines pass by it and when
+        info = {}
+        for line in self.lines:
+            if self.lines[line].is_stop_included(stopid):
+                info[line] =  self.lines[line].get_stop_pass_times(stopid)
+        return info
 
 
 if __name__ == "__main__":
