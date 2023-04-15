@@ -342,6 +342,7 @@ def main():
     print(map.edges)
     # l = map.compute_edge_length(edge=map.edges[1])
     # print(l)
+    print(map.shortest(1,2))
 
 
 if __name__ == "__main__":

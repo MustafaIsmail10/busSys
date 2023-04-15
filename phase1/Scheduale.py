@@ -1,6 +1,6 @@
 from Route import Route
 from Map import Map
-
+from Line import Line
 
 class Schedule:
 
@@ -9,7 +9,7 @@ class Schedule:
         self.routes = {}
         self.lines = {}
         self.route_count = 0
-        
+        self.line_count = 0
 
     def add_route(self):
         new_route = Route(self.map)
@@ -34,11 +34,19 @@ class Schedule:
     def get_route_info(self, route_id):
         return self.routes[route_id].get_route()
 
-    def addline():
-        pass
+    def change_stop_wait(self, route_id, stop_id, wait):
+        self.routes[route_id].change_wait(stop_id, wait)
 
-    def removeline():
-        pass
+    def addline(self, name, start_time, end_time, time_between_trips, route, description):
+        new_line = Line(name, start_time, end_time, time_between_trips, route, description )
+        self.line_count += 1
+        self.lines[self.line_count] = new_line
+        return self.line_count
+        
+
+    def removeline(self, line_id):
+        del self.lines[line_id]
+        
 
     def lineinfo():
         pass
@@ -50,19 +58,19 @@ class Schedule:
 if __name__ == "__main__":
     my_map = Map(path="./test/test_map.json")
     my_schedule = Schedule(my_map)
-    stopid1 = my_schedule.add_stop(1, False, 65, "Nice stop")
-    stopid2 = my_schedule.add_stop(2, False, 45, "Nice stop")
-    stopid3 = my_schedule.add_stop(3, False, 58, "Nice stop")
-    stopid4 = my_schedule.add_stop(4, False, 56, "Nice stop")
-    stopid5 = my_schedule.add_stop(5, False, 50, "Nice stop")
+    stopid1 = my_schedule.add_stop(1, False, 50, "Nice stop")
+    stopid2 = my_schedule.add_stop(2, True, 50, "Nice stop")
+
+    print(my_schedule.map.stoptimeDistance(stopid1, stopid2))
 
     routeid = my_schedule.add_route()
     my_schedule.add_stop_to_route(routeid, stopid1, 2)
     my_schedule.add_stop_to_route(routeid, stopid2, 2)
-    my_schedule.add_stop_to_route(routeid, stopid3, 2)
-    my_schedule.add_stop_to_route(routeid, stopid4, 2)
-    my_schedule.add_stop_to_route(routeid, stopid5, 2)
 
+    route = my_schedule.get_route_info(routeid)
+    print(route)
+
+    my_schedule.change_stop_wait(routeid, stopid1, 10)
     route = my_schedule.get_route_info(routeid)
     print(route)
     my_schedule.map.print_stops()
