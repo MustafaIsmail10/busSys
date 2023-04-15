@@ -111,11 +111,11 @@ class Map:
         path_length = 0
         path_time = 0
         for p in path:
-            p_length = self.compute_edge_length(self.edges[p]) / 100
-            p_time = path_length / self.edges[p]["speed"]
+            p_length = self.compute_edge_length(self.edges[p])
+            p_time = p_length / self.edges[p]["speed"]
             path_length += p_length
             path_time += p_time
-        return (path, path_length * 1000, path_time * 60)
+        return (path, path_length, path_time * 60)
 
     def shortest(self, node1, node2):
         """
@@ -146,7 +146,7 @@ class Map:
             node = self.__get_min_node(notVisited, time_list)
             for edge_id in self.nodes[node]["edges"]:
                 edge = self.edges[edge_id]
-                edge_length = self.compute_edge_length(edge) / 100
+                edge_length = self.compute_edge_length(edge)
                 edge_time = edge_length / edge["speed"]
                 toNode = edge["from"]
                 if edge["from"] == node:
@@ -218,17 +218,20 @@ class Map:
                     min_dist = distance
                     closest_point = point
                     closest_edge = edge
-                    # we can store the way index of the edge in the stops to make it easier to track the stops 
+                    # we can store the way index of the edge in the stops to make it easier to track the stops
                     closest_way = i
                 a = b
 
         percentage = self.dist(
-            self.nodes[self.edges[closest_edge]["from"]]["location"], closest_point
-        ) / self.compute_edge_length(self.edges[closest_edge]) # can be handled better by using closet way, edge , and point cordinates
-        return (closest_edge, closest_point, percentage) # would it make a difference using the edge id instead of the edge
+            self.nodes[self.edges[closest_edge]
+                       ["from"]]["location"], closest_point
+        ) / self.compute_edge_length(self.edges[closest_edge])  # can be handled better by using closet way, edge , and point cordinates
+        # would it make a difference using the edge id instead of the edge
+        return (closest_edge, closest_point, percentage)
 
     def addstop(self, edgeid, direction, percentage, description):
-        factor = (percentage * self.compute_edge_length(self.edges[edgeid])) / 100
+        factor = (
+            percentage * self.compute_edge_length(self.edges[edgeid])) / 100
 
         way = self.ways[self.edges[edgeid]["way"]]
         if not direction:
@@ -284,52 +287,42 @@ class Map:
         )
         return ret  # format or just return the stop dictionary?
 
-    ##******************************Review the following parts********************************########
-    def stoptimeDistance(self, stop1, stop2):
+    ## ******************************Review the following parts********************************########
+    def stoptimeDistance(self, stop1: int, stop2: int):
         s1 = self.busStops[stop1]
         s2 = self.busStops[stop2]
         if s1["direction"]:
             target_node = self.edges[s1["edge"]]["to"]
-            way1 = self.ways[self.edges[s1["edge"]]["way"]]
+            factor1 = (100 - s1["percent"]) / 100
+            dist_to_target = factor1 * \
+                self.compute_edge_length(self.edges[s1["edge"]])
         else:
             target_node = self.edges[s1["edge"]]["from"]
-            way1 = self.ways[self.edges[s1["edge"]]["way"]].copy().reverse()
+            factor1 = (s1["percent"]) / 100
+            dist_to_target = factor1 * \
+                self.compute_edge_length(self.edges[s1["edge"]])
 
         if s2["direction"]:
             src_node = self.edges[s2["edge"]]["from"]
-            way2 = self.ways[self.edges[s2["edge"]]["way"]]
+            factor2 = (s2["percent"]) / 100
+            dist_from_src = factor2 * \
+                self.compute_edge_length(self.edges[s2["edge"]])
 
         else:
             src_node = self.edges[s2["edge"]]["to"]
-            way2 = self.ways[self.edges[s2["edge"]]["way"]].copy().reverse()
+            factor2 = (100-s2["percent"]) / 100
+            dist_from_src = factor2 * \
+                self.compute_edge_length(self.edges[s2["edge"]])
 
-        factor1 = s1["percent"] * self.compute_edge_length(s1["edge"])
-        factor2 = s2["percent"] * self.compute_edge_length(s2["edge"])
-        node1 = way1[0]
-        dist1 = dist2 = 0
-        for i in range(1, len(way1)):
-            node2 = way1[i]
-            if self.dist(node1, node2) > factor1:
-                dist1 += self.dist(s1["loc"], node1)
-                break
-            dist1 += self.dist(node1, node2)
+        shortest_between_nodes = self.shortest(target_node, src_node)
 
-        node1 = way2[0]
-        for i in range(1, len(way1)):
-            node2 = way2[i]
-            if self.dist(node1, node2) > factor2:
-                dist2 += self.dist(s2["loc"], node1)
-                break
-            dist2 += self.dist(node1, node2)
+        path_length = shortest_between_nodes[1] + \
+            dist_from_src + dist_to_target
+        time_to_target = dist_to_target/self.edges[s1["edge"]]["speed"]
+        time_form_src = dist_from_src/self.edges[s2["edge"]]["speed"]
+        path_time = shortest_between_nodes[2] + time_form_src + time_to_target
+        return (path_length, path_time)
 
-        shortestDist = self.shortest(target_node, src_node)
-        fullDistance = shortestDist[0] + dist1 + dist2
-        time = (
-            shortestDist[1] + dist1 / s1["edge"]["speed"] + dist2 / s2["edge"]["speed"]
-        )
-        return (fullDistance, time)
-
-    
     def shorteststop(self, location):
         """
         Takes a location and returns the id of the closet stop to that location and returns None in case there is no stops
@@ -337,7 +330,7 @@ class Map:
         min_dist = 1e30
         min_stop = None
         for stop in self.busStops:
-            temp_dist = self.dist (self.busStops[stop]["location"], location)
+            temp_dist = self.dist(self.busStops[stop]["location"], location)
             if temp_dist < min_dist:
                 min_stop = stop
         return min_stop
@@ -345,7 +338,7 @@ class Map:
 
 def main():
     map = Map(path="./test/test_map.json")
-    path = map.shortest(7, 7)
+    path = map.shortest(1, 2)
     print(path)
     print(map.edges)
     l = map.compute_edge_length(edge=map.edges[1])

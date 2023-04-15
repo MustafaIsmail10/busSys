@@ -1,6 +1,7 @@
 import Map
+
 class Route:
-    def __init__(self,map):
+    def __init__(self,map:Map):
         self.orderedStops = [] 
         self.stops = {} #id and wait time
         self.start = -1

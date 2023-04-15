@@ -1,5 +1,5 @@
 import math
-
+from Route import Route
 
 class Line:
 
@@ -8,7 +8,7 @@ class Line:
         start_time and end_time are miniutes from starting from mid night
         a route of the Route class should be given
         """
-        self.route = route
+        self.route:Route = route
         self.name = name
         self.start_time = start_time
         self.end_time = end_time
@@ -17,7 +17,7 @@ class Line:
         self.description = description
 
     def get_bus_num(self):
-        trip_time = route.get_time()
+        trip_time = self.route.get_time()
         return math.ceil(trip_time/self.time_between_trips)
 
     def get_trips_num(self):
@@ -26,4 +26,3 @@ class Line:
         """
         total_time = (self.end_time - self.start_time) % 1440
         return total_time/self.time_between_trips
-    
