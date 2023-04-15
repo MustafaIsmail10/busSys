@@ -344,8 +344,8 @@ class Map:
 
 
 def main():
-    map = Map(path="../map.json")
-    path = map.shortest(7, 19)
+    map = Map(path="./test/test_map.json")
+    path = map.shortest(7, 7)
     print(path)
     print(map.edges)
     l = map.compute_edge_length(edge=map.edges[1])
