@@ -4,6 +4,10 @@ from Line import Line
 
 class Schedule:
 
+    """
+    This is the main class from which you can do everything in the system such as adding routes,stop, and lines
+    """
+
     def __init__(self, sys_map: Map):
         """
         The constructor which takes a map object as input 
@@ -16,7 +20,7 @@ class Schedule:
 
     def add_route(self):
         """
-        This function adds a new empty route 
+        This function adds a new empty route and later stops and can be added to that route
         """
         self.route_count += 1
         new_route_id = self.route_count

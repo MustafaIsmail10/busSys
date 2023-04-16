@@ -58,6 +58,8 @@ class Line:
         while time <= self.end_time + self.time_between_trips:
             passing_times.append(time)
             time += self.time_between_trips
+        
+        # This passing_times list contains a list of times in minutes in which the line would pass the stop from the start of the pass
         return passing_times
 
     def is_stop_included(self, stopid):
