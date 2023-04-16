@@ -1,6 +1,7 @@
 import math
 from Route import Route
 
+
 class Line:
     def __init__(
         self,
@@ -21,7 +22,7 @@ class Line:
         self.start_time = start_time
         self.end_time = end_time
         self.time_between_trips = time_between_trips
-        self.id = lineid  # id must be generated for each line
+        self.lineid = lineid  # id must be generated for each line
         self.description = description
 
     def get_bus_num(self):
@@ -57,4 +58,33 @@ class Line:
                 return True
         return False
 
-    
+    def get_line_stops(self):
+        return self.route.get_stops()
+
+    def get_info(self):
+        return (
+            self.lineid,
+            self.start_time,
+            self.end_time,
+            self.time_between_trips,
+            self.description,
+            self.get_line_stops(),
+        )
+
+    def update_name(self, name):
+        self.name = name
+
+    def update_start_time(self, start_time):
+        self.start_time = start_time
+
+    def update_end_time(self, end_time):
+        self.end_time = end_time
+
+    def update_time_between_trips(self, time):
+        self.time_between_trips = time
+
+    def update_description(self, description):
+        self.description = description
+
+    def __str__(self) -> str:
+        return str(self.get_info())
