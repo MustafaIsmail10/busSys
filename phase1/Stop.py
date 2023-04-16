@@ -2,7 +2,10 @@ from Line import Line
 
 
 class Stop:
-    
+    """
+    This class keeps information about a bus stops
+    A bus stop shall not be modified after creation since modifing a bus stop may have a great effect on other parts of the system
+    """
     def __init__(self, stopid, edgeid, percent, direction, description, loc):
         self.stopid = stopid
         self.edgeid = edgeid  # integer or another represention of the id

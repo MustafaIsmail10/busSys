@@ -1,6 +1,10 @@
 from uuid import uuid4
 
 class User:
+
+    """
+    This class keeps information about a user of the system and provide various functionalities such as login and logout
+    """
     def __init__(self, username, email, passwd):
         self.username = username
         self.email = email 
@@ -19,6 +23,7 @@ class User:
         return self.token == token
     
     def logout(self):
+        self.authorized = False
         self.token == None
 
 
