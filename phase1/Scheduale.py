@@ -60,7 +60,7 @@ class Schedule:
         stopid = self.map.addstop(edgeid,  direction, percentage,  description)
         return stopid
 
-    def remove_stop(self, stop_id):
+    def del_stop(self, stop_id):
         """
         This function removes a bus stop from the system
         """
@@ -73,6 +73,12 @@ class Schedule:
         This function adds existing bus stop to a route
         """
         self.routes[route_id].add_stop(stop_id, wait_time)    
+
+    def del_stop_from_route(self, route_id, stop_id):
+        """
+        This function removes existing bus stop from a route
+        """
+        self.routes[route_id].del_stop(stop_id)    
 
 
     def change_stop_wait(self, route_id, stop_id, wait):
@@ -89,12 +95,6 @@ class Schedule:
         new_line = Line(self.line_count, name, start_time, end_time, time_between_trips, self.routes[routeid], description )
         self.lines[self.line_count] = new_line
         return self.line_count
-
-    def removeline(self, line_id):
-        """
-        This function remove a line from the system
-        """
-        del self.lines[line_id]
 
     def get_lines(self):
         """
@@ -156,7 +156,7 @@ class Schedule:
         for line in self.lines:
             if self.lines[line].is_stop_included(stopid):
                 info[line] =  self.lines[line].get_stop_pass_times(stopid)
-        return info
+        return (self.map.getstop(stopid), info)
 
 
 # if __name__ == "__main__":

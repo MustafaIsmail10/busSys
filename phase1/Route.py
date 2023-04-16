@@ -128,7 +128,7 @@ class Route:
 
     def get_stops(self):
         """
-        Returns dictionary of stops with stopid as key and wait time as value.
+        Returns a list of stopids.
         """
         return self.orderedStops
 

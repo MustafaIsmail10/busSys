@@ -49,20 +49,23 @@ class Line:
         for stop in stops:
             if stop[0] == stopid:
                 passing_time_from_start = stop[1]
+
                 break
-        if not passing_time_from_start:
+        if passing_time_from_start == None:
             raise Exception("Stop was not found in the route of this line")
 
         time = self.start_time + passing_time_from_start
         while time <= self.end_time + self.time_between_trips:
             passing_times.append(time)
             time += self.time_between_trips
+        return passing_times
 
     def is_stop_included(self, stopid):
         """
         Checks if a stop is included in a line
         """
-        for stop in self.route.get_stops():
+        stops = self.route.get_stops()
+        for stop in stops:
             if stop == stopid:
                 return True
         return False
