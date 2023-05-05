@@ -1,6 +1,5 @@
 import Map
 
-
 class Route:
     """
     Route represents a list of ordered stops based on user preference,
@@ -25,6 +24,7 @@ class Route:
             self.start = stopid
         self.orderedStops.append(stopid)
         self.stops[stopid] = wait
+        return True
 
     def del_stop(self, stopid):
         """

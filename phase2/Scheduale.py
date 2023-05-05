@@ -79,12 +79,14 @@ class Schedule:
         This function adds existing bus stop to a route
         """
         self.routes[route_id].add_stop(stop_id, wait_time)    
+        return True
 
     def del_stop_from_route(self, route_id, stop_id):
         """
         This function removes existing bus stop from a route
         """
-        self.routes[route_id].del_stop(stop_id)    
+        self.routes[route_id].del_stop(stop_id)  
+          
 
 
     def change_stop_wait(self, route_id, stop_id, wait):

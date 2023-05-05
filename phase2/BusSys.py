@@ -37,8 +37,24 @@ class BusSys(Singleton):
         self.ids = 0
 
     @auth
-    def print_hello(self, message):
-        print("hello", message)
+    def add_map(self, **kwargs):
+        new_id = self.ids
+        self.ids += 1
+        new_map = Map(**kwargs)
+        self.maps[new_id] = new_map
+        return new_id
+
+    @auth
+    def get_map(self, map_id):
+        return self.maps[map_id]
+
+    @auth
+    def add_schedule(self, map_id, name):
+        new_id = self.ids
+        self.ids += 1
+        new_schedule = Schedule(self.maps[map_id], name, new_id)
+        self.schedules[new_id] = new_schedule
+        return new_id
 
     @auth
     def get_schedule(self, schdule_id):
@@ -47,213 +63,176 @@ class BusSys(Singleton):
         """
         return self.schedules[schdule_id]
 
+    ################################### STOPS START #############################
     @auth
     def get_stops(self, schdule_id):
         """
         This function is used to get all stops in the system
-        ex
-        print_stops
         """
         stops = self.schedules[schdule_id].get_stops()
         return stops
 
     @auth
-    def add_schedule(self, map_id, name):
-        with self.mutex:
-            new_id = self.ids
-            self.ids += 1
-            new_schedule = Schedule(self.maps[map_id], name, new_id)
-            self.schedules[new_id] = new_schedule
-            return new_id
-
-    @auth
-    def add_map(self, **kwargs):
-        with self.mutex:
-            new_id = self.ids
-            self.ids += 1
-            new_map = Map(**kwargs)
-            self.maps[new_id] = new_map
-            return new_id
-
-    def add_stop(self, sch_id , edgeid, directoin, percentage, description):
+    def add_stop(self, sch_id, edgeid, directoin, percentage, description):
         """
         This command is used to add a new stop
-        ex
-        add_stop edgeid directoin percentage "description"
         """
-        stop_id = self.schedules[sch_id].add_stop(int(edgeid), bool(directoin), int(percentage), description)
+        stop_id = self.schedules[sch_id].add_stop(
+            int(edgeid), bool(directoin), int(percentage), description)
         return stop_id
 
+    @auth
+    def del_stop(self, sch_id, stop_id):
+        """
+        This command is used to delete a stop
+        """
+        return self.schedules[sch_id].del_stop(int(stop_id))
 
-    # def do_del_stop(self, args):
-    #     """
-    #     This command is used to delete a stop
-    #     ex
-    #     del_stop stopid
-    #     """
-    #     Sys.schedule.remove_stop(int(args))
+    ############################## STOPS END #####################
 
-    # def do_add_route(self, args):
-    #     """
-    #     This command is used to add a new empty route to the system
-    #     ex
-    #     add_route
-    #     """
-    #     new_route_id = Sys.schedule.add_route()
-    #     print(f"The new route id is {new_route_id}")
+    ############################# ROUTES START #########################
 
-    # def do_print_route_info(self, args):
-    #     """
-    #     This command is used to print route info taking the routeid as input
-    #     ex
-    #     print_route_info routeid
-    #     """
-    #     route = Sys.schedule.get_route(int(args))
-    #     print(route)
+    @auth
+    def add_route(self, sch_id):
+        """
+        This command is used to add a new empty route to the system
+        """
+        new_route_id = self.schedules[sch_id].add_route()
+        return new_route_id
 
-    # def do_print_routes(self, args):
-    #     """
-    #     This command is used to print all routes of the system
-    #     ex
-    #     print_routes
-    #     """
-    #     routes = Sys.schedule.get_routes()
-    #     for route in routes:
-    #         print(routes[route])
+    @auth
+    def get_route(self, sch_id, routeid):
+        """
+        This command is used to get route with route id from schedule with sch_id
+        """
+        route = self.schedules[sch_id].get_route(int(routeid))
+        return route
 
-    # def do_add_stop_to_route(self, args):
-    #     """
-    #     This command is used to a stop to a specific route
-    #     ex
-    #     add_stop_to_route routeid stop_id wait_time
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.add_stop_to_route(int(ar[0]), int(ar[1]), int(ar[2]))
+    @auth
+    def get_routes(self, sch_id):
+        """
+        This command is used to get all routes of the system in a schedule
+        """
+        routes = self.schedules[sch_id].get_routes()
+        return routes
 
-    # def do_del_stop_from_route(self, args):
-    #     """
-    #     This command is used to remove a stop from a specific route
-    #     ex
-    #     del_stop_from_route routeid stop_id
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.del_stop_from_route(int(ar[0]), int(ar[1]))
+    @auth
+    def add_stop_to_route(self, sch_id, routeid, stop_id, wait_time):
+        """
+        This command is used to a stop to a specific route
+        """
+        status = self.schedules[sch_id].add_stop_to_route(
+            int(routeid), int(stop_id), int(wait_time))
+        return status
 
-    # def do_change_stop_wait(self, args):
-    #     """
-    #     This command is used to change the wait time of a stop insied a route
-    #     ex
-    #     change_stop_time routeid stopid wait_time
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.change_stop_wait(int([ar[0]]), int(ar[1]), int(ar[2]))
+    @auth
+    def del_stop_from_route(self, sch_id, routeid, stop_id):
+        """
+        This command is used to remove a stop from a specific route
+        """
+        self.schedules[sch_id].del_stop_from_route(int(routeid), int(stop_id))
+        return True
 
-    # def do_del_stop(self, args):
-    #     """
-    #     This command is used to remove a stop from the system
-    #     ex
-    #     del_stop stop_id
-    #     """
-    #     Sys.schedule.del_stop(int(args))
+    @auth
+    def change_stop_wait(self, sch_id, routeid, stopid, wait_time):
+        """
+        This command is used to change the wait time of a stop insied a route
+        """
+        self.schedules[sch_id].change_stop_wait(
+            int(routeid), int(stopid), int(wait_time))
 
-    # def do_add_line(self, args):
-    #     """
-    #     This command is used to add a line to the system
-    #     ex
-    #     add_line name start_time end_time time_between_trips routeid "description"
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.addline(
-    #         ar[0], int(ar[1]), int(ar[2]), int(ar[3]), int(ar[4]), int(ar[5])
-    #     )
+    @auth
+    def del_stop(self, sch_id, stop_id):
+        """
+        This command is used to remove a stop from the system
+        """
+        self.schedules[sch_id].del_stop(int(stop_id))
 
-    # def do_print_lines(self, args):
-    #     """
-    #     This command is used to print all line of the system
-    #     ex
-    #     print_lines
-    #     """
-    #     lines = Sys.schedule.get_lines()
-    #     for line in lines:
-    #         print(str(lines[line]))
+    ############################# Routes END #########################
 
-    # def do_del_line(self, args):
-    #     """
-    #     This command is used to delete line from the system
-    #     ex
-    #     del_line lineid
-    #     """
-    #     Sys.schedule.del_line(int(args))
+    ############################# LINES START ################################
 
-    # def do_update_line_name(self, args):
-    #     """
-    #     This command is used to update line name
-    #     ex
-    #     update_line_name lineid new_name
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.update_line_name(int(ar[0]), ar[1])
+    @auth
+    def add_line(self, sch_id, name, start_time, end_time, time_between_trips, routeid, description):
+        """
+        This command is used to add a line to the system
+        """
+        self.schedules[sch_id].addline(
+            name, int(start_time), int(end_time), int(
+                time_between_trips), int(routeid), int(description)
+        )
 
-    # def do_update_line_start_time(self, args):
-    #     """
-    #     This command is used to update line start time
-    #     ex
-    #     update_line_start_time lineid new_start_time
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.update_line_start_time(int(ar[0]), int(ar[1]))
+    @auth
+    def get_lines(self, sch_id):
+        """
+        This command is used to print all line of the system
+        """
+        lines = self.schedules[sch_id].get_lines()
+        return lines
 
-    # def do_update_line_end_time(self, args):
-    #     """
-    #     This command is used to update line end time
-    #     ex
-    #     update_line_end_time lineid new_end_time
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.update_line_end_time(int(ar[0]), int(ar[1]))
+    @auth
+    def del_line(self, sch_id,  lineid):
+        """
+        This command is used to delete line from the system
+        """
+        self.schedules[sch_id].del_line(int(lineid))
 
-    # def do_update_line_time_between_trips(self, args):
-    #     """
-    #     This command is used to update line start time
-    #     ex
-    #     update_line_time_between_trip lineid time_between_trips
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.update_line_time_between_trips(int(ar[0]), int(ar[1]))
+    @auth
+    def update_line_name(self, sch_id, lineid, new_name):
+        """
+        This command is used to update line name
+        """
+        self.schedules[sch_id].update_line_name(int(lineid), new_name)
 
-    # def do_update_line_description(self, args):
-    #     """
-    #     This command is used to update line start time
-    #     ex
-    #     update_line_description lineid "description"
-    #     """
-    #     ar = args.split(" ")
-    #     Sys.schedule.update_line_start_time(int(ar[0]), ar[1])
+    @auth
+    def update_line_start_time(self, sch_id,  lineid, new_start_time):
+        """
+        This command is used to update line start time
+        """
+        self.schedules[sch_id].update_line_start_time(
+            int(lineid), int(new_start_time))
 
-    # def do_get_stop_info(self, args):
-    #     """
-    #     This commnand return infomation about a stop
-    #     ex
-    #     get_stop_info stopid
-    #     """
-    #     data = Sys.schedule.stopinfo(int(args))
-    #     print(str(data[0]))
-    #     print(data[1])
+    @auth
+    def update_line_end_time(self, sch_id, lineid, new_end_time):
+        """
+        This command is used to update line end time
+        ex
+        update_line_end_time lineid new_end_time
+        """
+        self.schedules[sch_id].update_line_end_time(
+            int(lineid), int(new_end_time))
 
-    # def do_get_line_info(self, args):
-    #     """
-    #     This commnand return infomation about a line
-    #     ex
-    #     get_line_info lineid
-    #     """
-    #     data = Sys.schedule.lineinfo(int(args))
-    #     print(data)
+    @auth
+    def update_line_time_between_trips(self, sch_id, lineid, time_between_trips):
+        """
+        This command is used to update line start time
+        """
+        self.schedules[sch_id].update_line_time_between_trips(
+            int(lineid), int(time_between_trips))
 
+    @auth
+    def update_line_description(self, sch_id, lineid, description):
+        """
+        This command is used to update line start time
+        """
+        self.schedules[sch_id].update_line_start_time(int(lineid), description)
 
-u = User()
-t = u.login()
-sysBus = BusSys()
-sysBus.print_hello(u, t, "Hello from the outer")
+    @auth
+    def get_stop_info(self, sch_id, stopid):
+        """
+        This commnand return infomation about a stop
+        """
+        data = self.schedules[sch_id].stopinfo(int(stopid))
+        return data
 
+    @auth
+    def get_line_info(self, sch_id, lineid):
+        """
+        This commnand return infomation about a line
+        ex
+        get_line_info lineid
+        """
+        data = self.schedules[sch_id].lineinfo(int(lineid))
+        return data
 
-# sysBus.print_hello(u, t ,"Hello from the outer")
+    ############################# LINES END ################################
