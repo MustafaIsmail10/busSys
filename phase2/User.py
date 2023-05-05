@@ -20,6 +20,7 @@ class User:
         self.messages = []
         self.maps = []
         self.schedules = []
+        self.id = None
 
     def is_authenticated(self, token):
         return self.token == token and self.authorized
@@ -29,6 +30,12 @@ class User:
         self.authorized = True
         return self.token
     
+    def change_id (self, userid):
+        self.id = userid
+    
+    def get_id(self):
+        return self.id
+
     def register(self, username, passwd):
         self.username = username
         self.passwd = passwd

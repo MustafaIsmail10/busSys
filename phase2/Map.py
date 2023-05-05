@@ -8,11 +8,12 @@ from Stop import Stop
 
 class Map:
 
-    def __init__(self, **kwargs):
+    def __init__(self, map_id ,**kwargs):
         """
         Map class constructor which takes a json file
         or json string containing the data of the map as input
         """
+        self.map_id = map_id
         self.uids = 0  # is here for debugging purposes
         self.stopIds = 0
 
@@ -371,6 +372,8 @@ class Map:
                 min_dist = temp_dist # update min_dist
         return min_stop
 
+    def __str__(self):
+        return f"The map with id {self.map_id} has the following: \nNodes-->{self.nodes}, \nEdges-->{self.edges}, and \nStops-->{self.bus_stops}\n"
 
 
 

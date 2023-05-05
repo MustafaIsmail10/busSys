@@ -86,7 +86,7 @@ class Schedule:
         This function removes existing bus stop from a route
         """
         self.routes[route_id].del_stop(stop_id)  
-          
+
 
 
     def change_stop_wait(self, route_id, stop_id, wait):
@@ -166,7 +166,8 @@ class Schedule:
                 info[line] =  self.lines[line].get_stop_pass_times(stopid)
         return (self.map.getstop(stopid), info)
 
-
+    def __str__(self):
+        return f"The name of the schedule is {self.name} and id is {self.id}\nThe Lines are {self.lines}\nThe Routes are {self.routes}\n"
 # if __name__ == "__main__":
 #     my_map = Map(path="./test/test_map.json")
 #     my_schedule = Schedule(my_map)
