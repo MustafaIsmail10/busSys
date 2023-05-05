@@ -37,9 +37,16 @@ class BusSys(Singleton):
         self.ids = 0
 
     @auth
-    def add_map(self, **kwargs):
+    def add_map(self, type, mmap):
         new_id = self.ids
         self.ids += 1
+        kwargs = None
+
+        if int(type) == 1:
+            kwargs = {"json": mmap}
+        else:
+            kwargs = {"path": mmap}
+
         new_map = Map(**kwargs)
         self.maps[new_id] = new_map
         return new_id

@@ -63,7 +63,7 @@ class Map:
                 self.edges[edgeId] = newEdge
                 self.nodes[newKey]["edges"].append(edgeId)
                 self.nodes[newEdge["to"]]["edges"].append(edgeId)
-        
+
     # Generating unique id for each new item
     def get_uid(self):
         # uuid4 should be used in the final verison
