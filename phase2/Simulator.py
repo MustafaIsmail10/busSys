@@ -45,10 +45,13 @@ class Simulator:
 
 
     def update_passengers(self):
+        
         for lineid in self.waiting:
+            print(f"line {lineid}\'s wait {self.waiting[lineid]}")
             for passenger in self.waiting[lineid]:
                 if self.schedule.is_bus_at_stop(lineid, passenger[1], self.curr_time):
                     in_bus_time = passenger[0].bus_came()
+                    
                     self.waiting[lineid].remove(passenger)
                     self.in_bus[lineid].append((passenger, in_bus_time + self.curr_time))
                     
@@ -60,7 +63,7 @@ class Simulator:
 
 
     def passenger_generator(self):
-        for i in range(20):
+        for i in range(5):
             passenger_id = self.ids
             self.ids += 1
             loc = {
@@ -76,6 +79,7 @@ class Simulator:
             new_passenger = Passenger(passenger_id,loc, target, 20, self.map, self.schedule, self)
             p_thread = Thread(target=new_passenger.run, args=())
             self.passengers.append(new_passenger)
+            #self.waiting[?] = (new_passenger,?)
             p_thread.start()
 
 

@@ -27,6 +27,7 @@ class Passenger:
         self.status =  "Waiting"
         with self.cond:
             self.cond.wait()
+            print("hala from wait_bus in passenger class ")
         #self.time_waited = ?
 
     def wait_travel(self):
@@ -34,6 +35,7 @@ class Passenger:
             self.arriveStop.wait()
 
     def bus_came(self):
+        print("bus is here")
         with self.cond:
             self.cond.notify()
     
@@ -83,6 +85,10 @@ class Passenger:
                 min_route = routes[routeid]  
                 self.start_stop = s1
                 self.end_stop = s2
+        print("start end",self.start_stop,self.end_stop)
+
+        if self.start_stop==None or self.end_stop==None: #might be a bug , why would start and end stop be empty?
+           return (None,None)
         stop1_loc = self.map.get_stops()[self.start_stop].get_location()
         stop2_loc = self.map.get_stops()[self.end_stop].get_location()
         
@@ -99,7 +105,7 @@ class Passenger:
         if(shortest == (None,None)):
             return 
         self.walk(self.current_location, shortest[0])
-        self.wait_bus() #wait for bus
+        self.wait_bus() 
         print("on bus")
         self.wait_travel()
         self.walk(shortest[1],self.target)
