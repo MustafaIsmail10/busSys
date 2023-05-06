@@ -67,6 +67,12 @@ class Route:
         """
         self.stops[stopid] = new_wait
 
+    def get_stop_wait(self, stopid, new_wait):
+        """
+        edit the wait time of a stop
+        """
+        return self.stops[stopid]
+
     def get_stops_data(self):
         """
         Returns a list of triples which are (stop,arrival_time,leave_time)

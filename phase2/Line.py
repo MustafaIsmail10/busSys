@@ -58,7 +58,7 @@ class Line:
         while time <= self.end_time + self.time_between_trips:
             passing_times.append(time)
             time += self.time_between_trips
-        
+
         # This passing_times list contains a list of times in minutes in which the line would pass the stop from the start of the pass
         return passing_times
 
@@ -124,3 +124,13 @@ class Line:
 
     def __str__(self) -> str:
         return str(self.get_info())
+
+    def is_bus_at_stop(self, stopid, curr_time):
+        stop_pass_times = self.get_stop_pass_times(stopid)
+        for stop_time in stop_pass_times:
+            if curr_time < stop_time+ self.route.get_stop_wait(stopid) and curr_time > stop_time:
+                return True     
+        return False
+
+    def get_stops_data(self):
+        return self.route.get_stops_data()

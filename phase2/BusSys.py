@@ -1,8 +1,9 @@
 from User import User
-from Scheduale import Schedule
-from Map import Map
-from threading import RLock
+from ScheduleProxy import ScheduleProxy
+from MapProxy import MapProxy
+from threading import RLock, Semaphore, Thread
 from Exceptions import *
+from time import sleep
 
 
 def auth(method):
@@ -33,9 +34,36 @@ class BusSys(Singleton):
         self.schedules = {}
         self.maps = {}
         self.users = {}
-        self.mutex = RLock()
         self.ids = 0
+        self.sem = Semaphore(1)
+        self.write = Semaphore(1)
+        self.read_count = 0
 
+    def reader(func):
+        def synchronize(self, *args, **kwargs):
+            self.sem.acquire()
+            self.read_count += 1
+            if (self.read_count == 1):
+                self.write.acquire()
+            self.sem.release()
+            res = func(self, *args, **kwargs)
+            self.sem.acquire()
+            self.read_count -= 1
+            if (self.read_count == 0):
+                self.write.release()
+            self.sem.release()
+            return res
+        return synchronize
+
+    def writer(func):
+        def synchronize(self, *args, **kwargs):
+            self.write.acquire()
+            res = func(self, *args, **kwargs)
+            self.write.release()
+            return res
+        return synchronize
+
+    @writer
     def add_user(self, user):
         if user.get_id():
             return
@@ -45,6 +73,7 @@ class BusSys(Singleton):
             user.change_id(new_id)
             self.users[new_id] = user
 
+    @writer
     @auth
     def add_map(self, user, type, mmap):
         new_id = self.ids
@@ -55,32 +84,51 @@ class BusSys(Singleton):
         else:
             kwargs = {"path": mmap}
 
-        new_map = Map(new_id, **kwargs)
+        new_map = MapProxy(user,new_id, **kwargs)
         self.maps[new_id] = new_map
         user.add_map(new_id)
         return str(new_map)
 
+    @reader
     @auth
     def get_map(self, user, map_id):
-        return str(self.maps[int(map_id)])
+        resutl = str(self.maps[int(map_id)])
+        return resutl
 
+    @writer
     @auth
     def add_schedule(self, user, map_id, name):
         new_id = self.ids
         self.ids += 1
-        new_schedule = Schedule(self.maps[int(map_id)], name, new_id)
+        new_schedule = ScheduleProxy(user, self.maps[int(map_id)], name, new_id)
         self.schedules[new_id] = new_schedule
         user.add_schedule(new_id)
         return str(new_schedule)
 
+    @reader
     @auth
     def get_schedule(self, user,  schdule_id):
         """
         Returns a specific schedule
         """
         return str(self.schedules[int(schdule_id)])
+    
+    @reader
+    @auth
+    def get_schedules(self, user):
+        """
+        Returns a specific schedule
+        """
+        return str(self.schedules) + "\n"
+    
+    
+    @reader
+    @auth
+    def register_to_schedule(self, user, sch_id):
+        return self.schedules[int(sch_id)].register(user) 
 
     ################################### STOPS START #############################
+    @reader
     @auth
     def get_stops(self, user, schdule_id):
         """
@@ -94,6 +142,7 @@ class BusSys(Singleton):
         result += "}\n"
         return result
 
+    @reader
     @auth
     def add_stop(self, user, sch_id, edgeid, directoin, percentage, description):
         """
@@ -103,6 +152,7 @@ class BusSys(Singleton):
             int(edgeid), bool(directoin), int(percentage), description)
         return f"The id of the new stop is {str(stop_id)} is added to the system\n"
 
+    @reader
     @auth
     def del_stop(self, user, sch_id, stop_id):
         """
@@ -115,6 +165,7 @@ class BusSys(Singleton):
 
     ############################# ROUTES START #########################
 
+    @reader
     @auth
     def add_route(self, user, sch_id):
         """
@@ -123,6 +174,7 @@ class BusSys(Singleton):
         new_route_id = self.schedules[int(sch_id)].add_route()
         return f"A new route with id {new_route_id} is added to schedule with id {sch_id}\n"
 
+    @reader
     @auth
     def get_route(self, user, sch_id, routeid):
         """
@@ -131,6 +183,7 @@ class BusSys(Singleton):
         route = self.schedules[int(sch_id)].get_route(int(routeid))
         return str(route) + "\n"
 
+    @reader
     @auth
     def get_routes(self, user, sch_id):
         """
@@ -144,6 +197,7 @@ class BusSys(Singleton):
         result += "}\n"
         return result
 
+    @reader
     @auth
     def add_stop_to_route(self, user, sch_id, routeid, stop_id, wait_time):
         """
@@ -153,6 +207,7 @@ class BusSys(Singleton):
             int(routeid), int(stop_id), int(wait_time))
         return f"A stop with Stopid {stop_id} is added to route with id {routeid} in schedule {sch_id}\n"
 
+    @reader
     @auth
     def del_stop_from_route(self, user, sch_id, routeid, stop_id):
         """
@@ -162,6 +217,7 @@ class BusSys(Singleton):
             int(routeid), int(stop_id))
         return f"A stop with Stopid {stop_id} is deleted from route {routeid} in schedule {sch_id}\n"
 
+    @reader
     @auth
     def change_stop_wait(self, user, sch_id, routeid, stop_id, wait_time):
         """
@@ -174,7 +230,7 @@ class BusSys(Singleton):
     ############################# Routes END #########################
 
     ############################# LINES START ################################
-
+    @reader
     @auth
     def add_line(self, user, sch_id, name, start_time, end_time, time_between_trips, routeid, description):
         """
@@ -184,8 +240,9 @@ class BusSys(Singleton):
             name, int(start_time), int(end_time), int(
                 time_between_trips), int(routeid), description
         )
-        return f"A new line with lineid {lineid} is added to the system"
+        return f"A new line with lineid {lineid} is added to the system\n"
 
+    @reader
     @auth
     def get_lines(self, user, sch_id):
         """
@@ -199,6 +256,7 @@ class BusSys(Singleton):
         result += "}\n"
         return result
 
+    @reader
     @auth
     def del_line(self, user, sch_id,  lineid):
         """
@@ -207,6 +265,7 @@ class BusSys(Singleton):
         self.schedules[int(sch_id)].del_line(int(lineid))
         return f"Line with lineid {lineid} in schedule with id {sch_id} is deleted from the system\n"
 
+    @reader
     @auth
     def update_line_name(self, user, sch_id, lineid, new_name):
         """
@@ -215,8 +274,7 @@ class BusSys(Singleton):
         self.schedules[int(sch_id)].update_line_name(int(lineid), new_name)
         return f"Line with lineid {lineid} in schedule with id {sch_id} is name is changed to {new_name}\n"
 
-
-
+    @reader
     @auth
     def update_line_start_time(self, user, sch_id,  lineid, new_start_time):
         """
@@ -224,8 +282,9 @@ class BusSys(Singleton):
         """
         self.schedules[int(sch_id)].update_line_start_time(
             int(lineid), int(new_start_time))
-        return 
+        return f"Line with lineid {lineid} in schedule with id {sch_id} is start time is changed to {new_start_time}\n"
 
+    @reader
     @auth
     def update_line_end_time(self, user, sch_id, lineid, new_end_time):
         """
@@ -235,7 +294,9 @@ class BusSys(Singleton):
         """
         self.schedules[int(sch_id)].update_line_end_time(
             int(lineid), int(new_end_time))
+        return f"Line with lineid {lineid} in schedule with id {sch_id} is end time is changed to {new_end_time}\n"
 
+    @reader
     @auth
     def update_line_time_between_trips(self, user, sch_id, lineid, time_between_trips):
         """
@@ -243,7 +304,9 @@ class BusSys(Singleton):
         """
         self.schedules[int(sch_id)].update_line_time_between_trips(
             int(lineid), int(time_between_trips))
+        return f"Line with lineid {lineid} in schedule with id {sch_id} is time between trips is changed to {time_between_trips}\n"
 
+    @reader
     @auth
     def update_line_description(self, user, sch_id, lineid, description):
         """
@@ -251,15 +314,18 @@ class BusSys(Singleton):
         """
         self.schedules[int(sch_id)].update_line_start_time(
             int(lineid), description)
+        return f"Line with lineid {lineid} in schedule with id {sch_id} is description is changed to {description}\n"
 
+    @reader
     @auth
     def get_stop_info(self, user, sch_id, stopid):
         """
         This commnand return infomation about a stop
         """
-        data = self.schedules[int(sch_id)].stopinfo(int(stopid))
-        return data
+        stop, stop_lines = self.schedules[int(sch_id)].stopinfo(int(stopid))
+        return str(stop) + str(stop_lines) + "\n"
 
+    @reader
     @auth
     def get_line_info(self, user, sch_id, lineid):
         """
@@ -268,6 +334,53 @@ class BusSys(Singleton):
         get_line_info lineid
         """
         data = self.schedules[int(sch_id)].lineinfo(int(lineid))
-        return data
+        return data + "\n"
 
     ############################# LINES END ################################
+
+    ############################# TESTING ##################################
+
+#     @writer
+#     @auth
+#     def test_1_bus(self,  user, ):
+#         print("Writing")
+#         i = 0
+#         while True:
+#             i += 1
+
+#     @reader
+#     @auth
+#     def test_2_bus(self, user, rid):
+#         print("reading ", rid)
+#         i = 0
+#         while True:
+#             i += 1
+
+
+# def test_1(bus, user, token):
+#     bus.test_1_bus(user, token)
+
+
+# def test_2(bus, rid, user, token):
+#     bus.test_2_bus(user, token, rid)
+
+
+# busSys = BusSys()
+# user = User()
+# token = user.login()
+
+# th1 = Thread(target=test_1, args=(busSys, user, token))
+# th6 = Thread(target=test_1, args=(busSys, user, token))
+
+# th2 = Thread(target=test_2, args=(busSys, 1, user, token))
+# th3 = Thread(target=test_2, args=(busSys, 2, user, token))
+# th4 = Thread(target=test_2, args=(busSys, 3, user, token))
+# th5 = Thread(target=test_2, args=(busSys, 4, user, token))
+
+# th2.start()
+# th1.start()
+
+# th3.start()
+# th4.start()
+# th5.start()
+# th6.start()

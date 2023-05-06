@@ -384,7 +384,8 @@ class Map:
     def __str__(self):
         return f"The map with id {self.map_id} has the following: \nNodes-->{self.nodes}, \nEdges-->{self.edges}, and \nStops-->{self.bus_stops}\n"
 
-
+    def get_stops(self):
+        return self.bus_stops
 
 # def main():
 #     map = Map(path="./test/test_map.json")

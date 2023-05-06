@@ -61,3 +61,9 @@ class User:
                 new_messages = self.messages
                 self.messages = []
                 return new_messages
+
+
+    def notify(self, msg):
+        with self.mutex:
+            self.messages.append(msg)
+            self.wait_notification.notify()

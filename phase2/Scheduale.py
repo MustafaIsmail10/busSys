@@ -1,5 +1,5 @@
 from Route import Route
-from Map import Map
+from MapProxy import MapProxy
 from Line import Line
 
 class Schedule:
@@ -8,7 +8,7 @@ class Schedule:
     This is the main class from which you can do everything in the system such as adding routes,stop, and lines
     """
 
-    def __init__(self, sys_map: Map, name, sch_id):
+    def __init__(self, sys_map: MapProxy, name, sch_id):
         """
         The constructor which takes a map object as input 
         """
@@ -57,7 +57,7 @@ class Schedule:
         """
         This function returns all bus stops in the system
         """
-        return self.map.bus_stops
+        return self.map.get_stops()
 
     def add_stop(self, edgeid,  direction, percentage,  description):
         """
@@ -165,6 +165,15 @@ class Schedule:
             if self.lines[line].is_stop_included(stopid):
                 info[line] =  self.lines[line].get_stop_pass_times(stopid)
         return (self.map.getstop(stopid), info)
+
+
+    def is_bus_at_stop(self, lineid, stopid, curr_time):
+        return self.lines[lineid].is_bus_at_stop(stopid, curr_time)
+
+
+    def get_line_stops_data(self, lineid):
+        return self.lines[lineid].get_stops_data()
+
 
     def __str__(self):
         return f"The name of the schedule is {self.name} and id is {self.id}\nThe Lines are {self.lines}\nThe Routes are {self.routes}\n"

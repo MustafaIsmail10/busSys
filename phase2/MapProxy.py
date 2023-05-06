@@ -1,22 +1,34 @@
-from threading  import RLock, Thread
+from threading  import RLock
 from Map import Map
-import random as rand
-from time import sleep
+from User import User
 
 class MapProxy():
-    def __init__(self,map_id, **kwargs):
+    def __init__(self, user, map_id ,**kwargs):
+        self._map = Map(map_id, **kwargs)
         self.lock = RLock()
-        self._map = Map(map_id,**kwargs)
+        self.users = [user]
 
     def synched( func):
-        def synchronize(self,**kwargs):
+        def synchronize(self, *args, **kwargs):
             with self.lock:
-                return func(self,**kwargs)
+                return func(self, *args, **kwargs)
         return synchronize
     
     @synched
     def compute_edge_length(self, edge):
         return self._map.compute_edge_length(edge)
+
+    @synched
+    def get_users(self):
+        return self.uesrs
+
+    @synched
+    def register(self, user):
+        self.users.append(user)
+
+    @synched
+    def unregister(self, user):
+        self.users.remove(user)
 
     @synched
     def shortest(self, node1, node2):
@@ -39,6 +51,10 @@ class MapProxy():
         return self._map.getstop(stopid)
     
     @synched
+    def get_stops(self):
+        return self._map.get_stops()
+    
+    @synched
     def stoptimeDistance(self, stop1: int, stop2: int):
         return self._map.stoptimeDistance(stop1,stop2)
 
@@ -47,37 +63,5 @@ class MapProxy():
         return self._map.shorteststop(location)
     
     @synched
-    def stops_within_r(self, location, radius):
-        return self._map.stops_within_r(location,radius)
-    
-    @synched
-    def testing_sync(self):
-        i = 0
-        while True:
-            i += 1
-    @synched
-    def Testing_sync2(self):
-        print("OMGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
-
-
-def test1(map:MapProxy):
-    # while True:
-    #     edge = rand.random()*10
-    #     percent = rand.random()*100
-    #     map.add_stop(edge, True, percent,"kofta")
-    #     print(f"added to {edge} with True direction at {percent}%")
-    sleep(2)
-    map.testing_sync()
-
-def test2(map:MapProxy):
-    sleep(1)
-    map.Testing_sync2()
-    sleep(2)
-    map.Testing_sync2()
-
-kwargs = {"path": "./test/test_map.json"}
-m = MapProxy(0,**kwargs)
-t1 = Thread(target=test1,  args=(m,))
-t2 = Thread(target=test2,  args=(m,))
-t1.start()
-t2.start()
+    def __str__(self):
+        return str(self._map)
