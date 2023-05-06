@@ -1,8 +1,10 @@
 from threading import Thread, RLock, Condition
 from time import sleep
+from Passenger import Passenger
+import random
 
 class Simulator:
-    def __init__(self, user, schedule, start_time, end_time):
+    def __init__(self, user, schedule, mmap, start_time, end_time):
         self.start_time = start_time
         self.end_time = end_time
         self.curr_time = start_time
@@ -11,17 +13,20 @@ class Simulator:
         self.waiting = {}
         self.in_bus = {}
         lines = self.schedule.get_lines()
-        for line in lines:
-            self.waiting[line.lineid] = []
-            self.in_bus[line.lineid] = []
-        super.__init__()
+        for lineid in lines:
+            self.waiting[lineid] = []
+            self.in_bus[lineid] = []
         self.passengers = []
         self.gurdian = RLock()
         self.ids = 1
+        self.map = mmap
+        
 
     def run(self):
         pg = Thread(target=self.passenger_generator, args=())
-        pg.run()
+        pg.start()
+        print("Bl7aaaa")
+
         while self.curr_time < self.end_time:
             with self.gurdian:
                 self.curr_time += 1
@@ -55,9 +60,23 @@ class Simulator:
 
 
     def passenger_generator(self):
-        while True:
-            pass
-            # new_passenger = Passenger()
+        for i in range(20):
+            passenger_id = self.ids
+            self.ids += 1
+            loc = {
+                "x": random.randint(0, 85), 
+                "y":random.randint(20, 75)
+            }
+
+            target = {
+                "x": random.randint(0, 85), 
+                "y":random.randint(20, 75)
+            }
+
+            new_passenger = Passenger(passenger_id,loc, target, 10, self.map, self.schedule, self)
+            p_thread = Thread(target=new_passenger.run, args=())
+            self.passengers.append(new_passenger)
+            p_thread.start()
 
 
 # lines {

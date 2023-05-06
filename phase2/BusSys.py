@@ -4,7 +4,7 @@ from MapProxy import MapProxy
 from threading import RLock, Semaphore, Thread
 from Exceptions import *
 from time import sleep
-
+from Simulator import Simulator
 
 def auth(method):
     def f(self, user, token, *args, **kwargs):
@@ -121,6 +121,13 @@ class BusSys(Singleton):
         """
         return str(self.schedules) + "\n"
     
+    @auth
+    def simulate(self, user, sch_id):
+        print("Bl7aaaa1")
+        sim = Simulator(user, self.schedules[int(sch_id)], self.maps[0], 500, 700)
+        print("Bl7aaaa2")
+
+        sim.run()
     
     @reader
     @auth

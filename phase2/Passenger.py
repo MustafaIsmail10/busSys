@@ -5,7 +5,7 @@ from ScheduleProxy import ScheduleProxy
 import utilities as ut
 
 class Passenger:
-    def __init__(self,start_loc,target,radius, map: MapProxy, schedule:ScheduleProxy, simul) -> None:
+    def __init__(self,pid, start_loc,target,radius, map: MapProxy, schedule:ScheduleProxy, simul) -> None:
         self.current_location = start_loc
         self.target =  target
         self.start =  start_loc #location dictionary
@@ -18,6 +18,7 @@ class Passenger:
         self.time_waited = 0
         self.start_stop = None
         self.end_stop = None
+        self.id = pid
     
     #wait for bus
     def wait_bus(self):
