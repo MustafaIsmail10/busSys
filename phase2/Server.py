@@ -50,13 +50,19 @@ class Server():
                 req = sock.recv(1000)
 
     def handle_req(self, req, user , token):
+        result = None
         try:
             func = getattr(self.busSys, req[0])
+            result = func(user, token, *req[1:])
         except AttributeError:
             print("not found")
+            return "ERROR, Command not found\n"
+        except Exception as e:
+            print(e)
+            return f"ERROR {str(e)}\n"
         print("user",user)
         print(token)
-        return str(func(user, token, *req[1:]))
+        return str(result)
 
     def agent(self, ns):
         user = User()
@@ -116,7 +122,7 @@ class Server():
 
 
 def main():
-    s = Server(1427)
+    s = Server(1477)
     s.server()
     pass
 

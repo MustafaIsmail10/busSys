@@ -37,14 +37,14 @@ class BusSys(Singleton):
         self.ids = 0
 
     def add_user(self, user):
-        if user.get_id() :
+        if user.get_id():
             return
         else:
             new_id = self.ids
-            self.ids  += 1 
+            self.ids += 1
             user.change_id(new_id)
             self.users[new_id] = user
-            
+
     @auth
     def add_map(self, user, type, mmap):
         new_id = self.ids
@@ -91,7 +91,7 @@ class BusSys(Singleton):
         for s in stops:
             result += str(s) + ": "
             result += str(stops[s]) + ","
-        result += "\n"
+        result += "}\n"
         return result
 
     @auth
@@ -101,7 +101,7 @@ class BusSys(Singleton):
         """
         stop_id = self.schedules[int(sch_id)].add_stop(
             int(edgeid), bool(directoin), int(percentage), description)
-        return  f"The id of the new stop is {str(stop_id)} is added to the system\n" 
+        return f"The id of the new stop is {str(stop_id)} is added to the system\n"
 
     @auth
     def del_stop(self, user, sch_id, stop_id):
@@ -121,7 +121,7 @@ class BusSys(Singleton):
         This command is used to add a new empty route to the system
         """
         new_route_id = self.schedules[int(sch_id)].add_route()
-        return new_route_id
+        return f"A new route with id {new_route_id} is added to schedule with id {sch_id}\n"
 
     @auth
     def get_route(self, user, sch_id, routeid):
@@ -129,7 +129,7 @@ class BusSys(Singleton):
         This command is used to get route with route id from schedule with sch_id
         """
         route = self.schedules[int(sch_id)].get_route(int(routeid))
-        return route
+        return str(route) + "\n"
 
     @auth
     def get_routes(self, user, sch_id):
@@ -137,7 +137,12 @@ class BusSys(Singleton):
         This command is used to get all routes of the system in a schedule
         """
         routes = self.schedules[int(sch_id)].get_routes()
-        return routes
+        result = "{"
+        for s in routes:
+            result += str(s) + ": "
+            result += str(routes[s]) + ","
+        result += "}\n"
+        return result
 
     @auth
     def add_stop_to_route(self, user, sch_id, routeid, stop_id, wait_time):
@@ -146,23 +151,25 @@ class BusSys(Singleton):
         """
         status = self.schedules[int(sch_id)].add_stop_to_route(
             int(routeid), int(stop_id), int(wait_time))
-        return status
+        return f"A stop with Stopid {stop_id} is added to route with id {routeid} in schedule {sch_id}\n"
 
     @auth
     def del_stop_from_route(self, user, sch_id, routeid, stop_id):
         """
         This command is used to remove a stop from a specific route
         """
-        self.schedules[int(sch_id)].del_stop_from_route(int(routeid), int(stop_id))
-        return True
+        self.schedules[int(sch_id)].del_stop_from_route(
+            int(routeid), int(stop_id))
+        return f"A stop with Stopid {stop_id} is deleted from route {routeid} in schedule {sch_id}\n"
 
     @auth
-    def change_stop_wait(self, user, sch_id, routeid, stopid, wait_time):
+    def change_stop_wait(self, user, sch_id, routeid, stop_id, wait_time):
         """
         This command is used to change the wait time of a stop insied a route
         """
-        self.schedules[sch_id].change_stop_wait(
-            int(routeid), int(stopid), int(wait_time))
+        self.schedules[int(sch_id)].change_stop_wait(
+            int(routeid), int(stop_id), int(wait_time))
+        return f"A stop with Stopid {stop_id} is in route with {routeid} in schedule {sch_id}, wait time is chaned to {wait_time}\n"
 
     ############################# Routes END #########################
 
@@ -173,10 +180,11 @@ class BusSys(Singleton):
         """
         This command is used to add a line to the system
         """
-        self.schedules[int(sch_id)].addline(
+        lineid = self.schedules[int(sch_id)].addline(
             name, int(start_time), int(end_time), int(
-                time_between_trips), int(routeid), int(description)
+                time_between_trips), int(routeid), description
         )
+        return f"A new line with lineid {lineid} is added to the system"
 
     @auth
     def get_lines(self, user, sch_id):
@@ -184,7 +192,12 @@ class BusSys(Singleton):
         This command is used to print all line of the system
         """
         lines = self.schedules[int(sch_id)].get_lines()
-        return lines
+        result = "{"
+        for s in lines:
+            result += str(s) + ": "
+            result += str(lines[s]) + ","
+        result += "}\n"
+        return result
 
     @auth
     def del_line(self, user, sch_id,  lineid):
@@ -192,6 +205,7 @@ class BusSys(Singleton):
         This command is used to delete line from the system
         """
         self.schedules[int(sch_id)].del_line(int(lineid))
+        return f"Line with lineid {lineid} in schedule with id {sch_id} is deleted from the system\n"
 
     @auth
     def update_line_name(self, user, sch_id, lineid, new_name):
@@ -199,6 +213,9 @@ class BusSys(Singleton):
         This command is used to update line name
         """
         self.schedules[int(sch_id)].update_line_name(int(lineid), new_name)
+        return f"Line with lineid {lineid} in schedule with id {sch_id} is name is changed to {new_name}\n"
+
+
 
     @auth
     def update_line_start_time(self, user, sch_id,  lineid, new_start_time):
@@ -207,6 +224,7 @@ class BusSys(Singleton):
         """
         self.schedules[int(sch_id)].update_line_start_time(
             int(lineid), int(new_start_time))
+        return 
 
     @auth
     def update_line_end_time(self, user, sch_id, lineid, new_end_time):
@@ -231,7 +249,8 @@ class BusSys(Singleton):
         """
         This command is used to update line start time
         """
-        self.schedules[int(sch_id)].update_line_start_time(int(lineid), description)
+        self.schedules[int(sch_id)].update_line_start_time(
+            int(lineid), description)
 
     @auth
     def get_stop_info(self, user, sch_id, stopid):

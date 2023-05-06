@@ -76,23 +76,25 @@ class Route:
         # from the previous stop and the current, found in Map class using stoptimeDistance().
         # For last element of list, only stop (which is start actually) and arrival time
         # are passed.
-        first = self.orderedStops[0]
         route = []
-        route.append((first, 0, self.stops[first]))  # stopid, starttime, leavetime
-        for i in range(1, len(self.orderedStops)):
-            second = self.orderedStops[i]
-            result = self.map.stoptimeDistance(first, second)
-            arrive = (
-                result[1] + route[i - 1][2]
-            )  # travel time + previous stop leave time
-            leave = arrive + self.stops[second]  # add wait time
-            route.append((second, arrive, leave))
-            first = second
-        last_trip = self.map.stoptimeDistance(
-            self.orderedStops[-1], self.orderedStops[0]
-        )
-        arrive = last_trip[1] + route[-1][2]
-        route.append((self.orderedStops[0], arrive))
+        if len(self.orderedStops ) > 0:
+            first = self.orderedStops[0]
+            route.append((first, 0, self.stops[first]))  # stopid, starttime, leavetime
+            for i in range(1, len(self.orderedStops)):
+                second = self.orderedStops[i]
+                result = self.map.stoptimeDistance(first, second)
+                arrive = (
+                    result[1] + route[i - 1][2]
+                )  # travel time + previous stop leave time
+                leave = arrive + self.stops[second]  # add wait time
+                route.append((second, arrive, leave))
+                first = second
+            last_trip = self.map.stoptimeDistance(
+                self.orderedStops[-1], self.orderedStops[0]
+            )
+            arrive = last_trip[1] + route[-1][2]
+            route.append((self.orderedStops[0], arrive))
+        
         return route
 
     def get_time(self):
