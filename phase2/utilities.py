@@ -5,6 +5,8 @@ This module contains some utility functions that is used in the whole project.
 
 import math
 
+def dist(a, b):
+    return math.sqrt((a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2)
 
 def euclidean_distance(x1, y1, x2, y2):
     """

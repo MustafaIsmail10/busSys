@@ -372,6 +372,15 @@ class Map:
                 min_dist = temp_dist # update min_dist
         return min_stop
 
+    def stops_within_r(self, location, radius):
+        stops = []
+        for stop in self.bus_stops:
+            temp_dist = self.dist(self.bus_stops[stop].get_location(), location)
+            if temp_dist < radius:
+                stops.append(stop)
+                
+        return stops
+
     def __str__(self):
         return f"The map with id {self.map_id} has the following: \nNodes-->{self.nodes}, \nEdges-->{self.edges}, and \nStops-->{self.bus_stops}\n"
 

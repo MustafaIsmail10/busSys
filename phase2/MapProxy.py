@@ -1,11 +1,12 @@
-from phase1.Map import *
-from threading  import RLock
+from threading  import RLock, Thread
 from Map import Map
+import random as rand
+from time import sleep
 
 class MapProxy():
-    def __init__(self, **kwargs):
-        self.guardian = RLock()
-        self._map = Map(kwargs)
+    def __init__(self,map_id, **kwargs):
+        self.lock = RLock()
+        self._map = Map(map_id,**kwargs)
 
     def synched( func):
         def synchronize(self,**kwargs):
@@ -44,3 +45,39 @@ class MapProxy():
     @synched 
     def shorteststop(self, location):
         return self._map.shorteststop(location)
+    
+    @synched
+    def stops_within_r(self, location, radius):
+        return self._map.stops_within_r(location,radius)
+    
+    @synched
+    def testing_sync(self):
+        i = 0
+        while True:
+            i += 1
+    @synched
+    def Testing_sync2(self):
+        print("OMGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+
+
+def test1(map:MapProxy):
+    # while True:
+    #     edge = rand.random()*10
+    #     percent = rand.random()*100
+    #     map.add_stop(edge, True, percent,"kofta")
+    #     print(f"added to {edge} with True direction at {percent}%")
+    sleep(2)
+    map.testing_sync()
+
+def test2(map:MapProxy):
+    sleep(1)
+    map.Testing_sync2()
+    sleep(2)
+    map.Testing_sync2()
+
+kwargs = {"path": "./test/test_map.json"}
+m = MapProxy(0,**kwargs)
+t1 = Thread(target=test1,  args=(m,))
+t2 = Thread(target=test2,  args=(m,))
+t1.start()
+t2.start()

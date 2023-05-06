@@ -9,7 +9,7 @@ class ScheduleProxy():
         self._schedule = Schedule(sys_map,name, sch_id)
         self.lock = th.RLock()
 
-    def synched( func):
+    def synched(func):
         def synchronize(self,**kwargs):
             with self.lock:
                 return func(self,**kwargs)
@@ -106,5 +106,5 @@ class ScheduleProxy():
         return self._schedule.stopinfo(stopid)
 
 kwargs = {"path": "./test/test_map.json"}
-t = ScheduleProxy(Map(**kwargs),"toto",0)
+t = ScheduleProxy(Map(0, **kwargs),"toto",0)
 t.test()
