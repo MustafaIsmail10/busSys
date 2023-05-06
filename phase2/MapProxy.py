@@ -63,5 +63,9 @@ class MapProxy():
         return self._map.shorteststop(location)
     
     @synched
+    def stops_within_r(self, location, radius):
+        return self._map.stops_within_r(location,radius)
+    
+    @synched
     def __str__(self):
         return str(self._map)

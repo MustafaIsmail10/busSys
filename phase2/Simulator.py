@@ -73,7 +73,7 @@ class Simulator:
                 "y":random.randint(20, 75)
             }
 
-            new_passenger = Passenger(passenger_id,loc, target, 10, self.map, self.schedule, self)
+            new_passenger = Passenger(passenger_id,loc, target, 20, self.map, self.schedule, self)
             p_thread = Thread(target=new_passenger.run, args=())
             self.passengers.append(new_passenger)
             p_thread.start()
