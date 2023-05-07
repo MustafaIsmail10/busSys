@@ -7,8 +7,7 @@ from Stop import Stop
 
 
 class Map:
-
-    def __init__(self, map_id ,**kwargs):
+    def __init__(self, map_id, **kwargs):
         """
         Map class constructor which takes a json file
         or json string containing the data of the map as input
@@ -167,27 +166,24 @@ class Map:
 
     # Shotest path calculation end ******************************************
 
-    
-    
-
     def dist(self, a, b):
         return sqrt((a["x"] - b["x"]) ** 2 + (a["y"] - b["y"]) ** 2)
 
     def closestedge(self, loc):
-        '''
-        Gets the closest edge to a location and returns it 
+        """
+        Gets the closest edge to a location and returns it
         along with, the closest point on that edge,
         and the percentage of the point from the edge start, in a triple.
-        '''
+        """
         closest_point = None
-        min_dist = 1e30  
-        #by looping over all edges
-        #then the ways of the edges to calculate the formula for 
-        #point vs line segment which tells us where on the line is closest
-        #to that point. then finds the distance between the loc and that point,
-        #if it is the minimum, the minimum is set to it and the closest edge
-        #is set to the current edge.
-        
+        min_dist = 1e30
+        # by looping over all edges
+        # then the ways of the edges to calculate the formula for
+        # point vs line segment which tells us where on the line is closest
+        # to that point. then finds the distance between the loc and that point,
+        # if it is the minimum, the minimum is set to it and the closest edge
+        # is set to the current edge.
+
         for edge in self.edges:
             way = self.ways[self.edges[edge]["way"]]
             a = way[0]
@@ -207,24 +203,22 @@ class Map:
                     min_dist = distance
                     closest_point = point
                     closest_edge = edge
-                    
+
                 a = b
-        #percentage is found using euclidean distance between closest point
-        #and edge start, divided by the total edge length
+        # percentage is found using euclidean distance between closest point
+        # and edge start, divided by the total edge length
         percentage = self.dist(
             self.nodes[self.edges[closest_edge]["from"]]["location"], closest_point
-        ) / self.compute_edge_length(
-            self.edges[closest_edge]
-        )  
+        ) / self.compute_edge_length(self.edges[closest_edge])
         return (closest_edge, closest_point, percentage)
 
     def addstop(self, edgeid, direction, percentage, description):
-        '''
+        """
         adds a stop in the map on a given edge and at a given percentage
         with either a left or right poistion relative to the edge.
         Also stores the description of this stop.
         returns id of the stop.
-        '''
+        """
 
         # use percentage to calculate how far into the edge the stop will be
         # if direction is reversed, percentage is also affected
@@ -246,7 +240,7 @@ class Map:
             if way_distance >= factor:
                 temp = utilities.multiply(
                     (factor / way_distance), utilities.subtract(node2, node1)
-                ) 
+                )
                 coordinate = utilities.add(node1, temp)
                 break
             node1 = node2
@@ -265,13 +259,13 @@ class Map:
         # self.bus_stops[self.stopIds]["description"] = description
         # self.bus_stops[self.stopIds]["edge"] = edgeid
         # self.bus_stops[self.stopIds]["percent"] = percentage
-        self.edges[edgeid]["stops"].append(self.stopIds) # updates edge's stops list
+        self.edges[edgeid]["stops"].append(self.stopIds)  # updates edge's stops list
         return self.stopIds
 
     def delstop(self, stopid):
-        '''
+        """
         removes a stop from the map given the id
-        '''
+        """
         if self.stopIds == 0:
             raise Exception("no more stops to delete!")
         if stopid > self.stopIds or stopid not in self.bus_stops:
@@ -284,9 +278,9 @@ class Map:
         return "successful deletion"
 
     def getstop(self, stopid):
-        '''
+        """
         returns a Stop object whose representation is in the overloaded __str__ method
-        '''
+        """
         if self.stopIds == 0 or stopid > self.stopIds or stopid not in self.bus_stops:
             raise Exception("no such stop!")
 
@@ -299,15 +293,15 @@ class Map:
         #     to=edge["to"],
         #     edgeid=stop["edge"],
         # )
-        return stop  
+        return stop
 
     ## ******************************Review the following parts********************************########
     def stoptimeDistance(self, stop1: int, stop2: int):
-        '''
+        """
         Gets the shortest distance and time between 2 stops, returns them in tuple
-        If the direction of the stop is False the src and target are swapped. 
-        
-        '''
+        If the direction of the stop is False the src and target are swapped.
+
+        """
         if stop1 not in self.bus_stops:
             raise Exception("stop1 unavailable")
         if stop2 not in self.bus_stops:
@@ -315,7 +309,7 @@ class Map:
 
         s1 = self.bus_stops[stop1]
         s2 = self.bus_stops[stop2]
-        
+
         if s1.direction:
             target_node = self.edges[s1.get_edgeid()]["to"]
             factor1 = (100 - s1.get_percent()) / 100
@@ -343,18 +337,19 @@ class Map:
                 self.edges[s2.get_edgeid()]
             )
 
-
         # by using
-        # the shortest() function to find the distance between 
+        # the shortest() function to find the distance between
         # the target node of stop1 and the src node of stop 2.
-        # Adds to that the distance from stop to node using 
+        # Adds to that the distance from stop to node using
         # the percentage of the stop on the edge and
         # multiplying it with the length of the edge.
 
         shortest_between_nodes = self.shortest(target_node, src_node)
 
         path_length = shortest_between_nodes[1] + dist_from_src + dist_to_target
-        time_to_target = dist_to_target / self.edges[s1.get_edgeid()]["speed"] # time found by dividing dist/speed of relevant edge
+        time_to_target = (
+            dist_to_target / self.edges[s1.get_edgeid()]["speed"]
+        )  # time found by dividing dist/speed of relevant edge
         time_form_src = dist_from_src / self.edges[s2.get_edgeid()]["speed"]
         path_time = shortest_between_nodes[2] + time_form_src + time_to_target
         return (path_length, path_time)
@@ -369,7 +364,7 @@ class Map:
             temp_dist = self.dist(self.bus_stops[stop].get_location(), location)
             if temp_dist < min_dist:
                 min_stop = stop
-                min_dist = temp_dist # update min_dist
+                min_dist = temp_dist  # update min_dist
         return min_stop
 
     def stops_within_r(self, location, radius):
@@ -378,14 +373,19 @@ class Map:
             temp_dist = self.dist(self.bus_stops[stop].get_location(), location)
             if temp_dist < radius:
                 stops.append(stop)
-                
+
         return stops
 
     def __str__(self):
-        return f"The map with id {self.map_id} has the following: \nNodes-->{self.nodes}, \nEdges-->{self.edges}, and \nStops-->{self.bus_stops}\n"
+        msg = f"Mapid {self.map_id} has the following:\nNodes-->{self.nodes}\nEdges-->{self.edges}\nStops-->"
+        for stopid in self.bus_stops:
+            msg += f"({self.bus_stops[stopid]})\n"
+        msg += "\n"
+        return msg
 
     def get_stops(self):
         return self.bus_stops
+
 
 # def main():
 #     map = Map(path="./test/test_map.json")

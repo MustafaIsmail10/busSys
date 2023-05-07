@@ -67,7 +67,7 @@ class Route:
         """
         self.stops[stopid] = new_wait
 
-    def get_stop_wait(self, stopid, new_wait):
+    def get_stop_wait(self, stopid):
         """
         edit the wait time of a stop
         """

@@ -75,6 +75,21 @@ class Server():
         task2.start()
 
     def user_cmd(self, sock, user, token):
+        req = sock.recv(1000)
+        while req and req != '':
+            parsed = self.parse(req)
+            handled_req_response = self.handle_req(parsed, user, token)
+            sock.send(handled_req_response.encode())
+            req = sock.recv(1000)
+
+    def notif_handler(self, sock, user, token):
+        while True:
+            notificatoins = user.get_notifications()
+            sock.send(str(notificatoins).encode())
+
+    def server(self):
+        user = User()
+        token = user.login()
         # TESTING START
         self.busSys.add_map(user, token, 0, "./test/test_map.json")
         self.busSys.add_schedule(user, token, 0, "The First one")
@@ -154,20 +169,6 @@ class Server():
         self.busSys.add_line(user, token, 1, "Green Ring", 100, 1200, 30, 4, "This is the green line")
         self.busSys.add_line(user, token, 1, "Purple Ring", 160, 1300, 20, 5, "This is the purple line")
         # TESTING END
-
-        req = sock.recv(1000)
-        while req and req != '':
-            parsed = self.parse(req)
-            handled_req_response = self.handle_req(parsed, user, token)
-            sock.send(handled_req_response.encode())
-            req = sock.recv(1000)
-
-    def notif_handler(self, sock, user, token):
-        while True:
-            notificatoins = user.get_notifications()
-            sock.send(str(notificatoins).encode())
-
-    def server(self):
         self.sock = socket(AF_INET, SOCK_STREAM)
         self.sock.bind(('0.0.0.0', self.port))
         self.sock.listen()  # check limitations
@@ -187,7 +188,7 @@ class Server():
 
 
 def main():
-    s = Server(int(sys.argv[1]))
+    s = Server(int(sys.argv[2]))
     try:
         s.server()
     except KeyboardInterrupt:

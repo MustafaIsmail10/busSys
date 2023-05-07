@@ -14,6 +14,16 @@ class MapProxy():
                 return func(self, *args, **kwargs)
         return synchronize
     
+
+    def notify(func):
+        def notification(self, *args, **kwargs):
+                res = func(self, *args, **kwargs)
+                for user in self.users:
+                    user.notify(res)
+                return res
+        return notification
+
+
     @synched
     def compute_edge_length(self, edge):
         return self._map.compute_edge_length(edge)
@@ -23,10 +33,12 @@ class MapProxy():
         return self.uesrs
 
     @synched
+    @notify
     def register(self, user):
         self.users.append(user)
 
     @synched
+    @notify
     def unregister(self, user):
         self.users.remove(user)
 
@@ -39,10 +51,12 @@ class MapProxy():
         return self._map.closestedge(loc)
 
     @synched
+    @notify
     def addstop(self, edgeid, direction, percentage, description):
         return self._map.addstop(edgeid,direction,percentage, description)
     
     @synched
+    @notify
     def delstop(self, stopid):
         return self._map.delstop(stopid)
 

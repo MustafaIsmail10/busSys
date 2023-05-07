@@ -6,19 +6,20 @@ from Exceptions import *
 from time import sleep
 from Simulator import Simulator
 
+
 def auth(method):
     def f(self, user, token, *args, **kwargs):
         if user.is_authenticated(token):
             return method(self, user, *args, **kwargs)
         else:
-            raise UserNotAuthenticated(
-                "Invalid Access. User is not authenticated")
+            raise UserNotAuthenticated("Invalid Access. User is not authenticated")
+
     return f
 
 
 class Singleton:
     def __new__(cls, *a, **b):
-        if hasattr(cls, '_inst'):
+        if hasattr(cls, "_inst"):
             return cls._inst
         else:
             cls._inst = super().__new__(cls, *a, **b)
@@ -27,7 +28,7 @@ class Singleton:
 
 class BusSys(Singleton):
     """
-    This class shall be the main controller of the system 
+    This class shall be the main controller of the system
     """
 
     def __init__(self):
@@ -43,16 +44,17 @@ class BusSys(Singleton):
         def synchronize(self, *args, **kwargs):
             self.sem.acquire()
             self.read_count += 1
-            if (self.read_count == 1):
+            if self.read_count == 1:
                 self.write.acquire()
             self.sem.release()
             res = func(self, *args, **kwargs)
             self.sem.acquire()
             self.read_count -= 1
-            if (self.read_count == 0):
+            if self.read_count == 0:
                 self.write.release()
             self.sem.release()
             return res
+
         return synchronize
 
     def writer(func):
@@ -61,6 +63,7 @@ class BusSys(Singleton):
             res = func(self, *args, **kwargs)
             self.write.release()
             return res
+
         return synchronize
 
     @writer
@@ -84,7 +87,7 @@ class BusSys(Singleton):
         else:
             kwargs = {"path": mmap}
 
-        new_map = MapProxy(user,new_id, **kwargs)
+        new_map = MapProxy(user, new_id, **kwargs)
         self.maps[new_id] = new_map
         user.add_map(new_id)
         return str(new_map)
@@ -94,6 +97,21 @@ class BusSys(Singleton):
     def get_map(self, user, map_id):
         resutl = str(self.maps[int(map_id)])
         return resutl
+
+    @reader
+    @auth
+    def get_maps(self, user):
+        result = ""
+        for mapid in self.maps:
+            result += f"{str(self.maps[mapid])}\n\n "
+        return result
+
+    @reader
+    @auth
+    def register_to_map(self, user, mapid):
+        self.maps[int(mapid)].register(user)
+        return f"You are registered to map with id {mapid}\n"
+
 
     @writer
     @auth
@@ -107,32 +125,34 @@ class BusSys(Singleton):
 
     @reader
     @auth
-    def get_schedule(self, user,  schdule_id):
+    def get_schedule(self, user, schdule_id):
         """
         Returns a specific schedule
         """
         return str(self.schedules[int(schdule_id)])
-    
+
     @reader
     @auth
     def get_schedules(self, user):
         """
         Returns a specific schedule
         """
-        return str(self.schedules) + "\n"
-    
-    @auth
-    def simulate(self, user, sch_id):
-        print("Bl7aaaa1")
-        sim = Simulator(user, self.schedules[int(sch_id)], self.maps[0], 500, 700)
-        print("Bl7aaaa2")
+        result = ""
+        for sch_id in self.schedules:
+            result += f"({str(self.schedules[sch_id])})\n"
+        return result
 
+    @reader
+    @auth
+    def simulate(self, user, sch_id, start_time, end_time):
+        sim = Simulator(user, self.schedules[int(sch_id)], int(start_time), int(end_time))
         sim.run()
-    
+        return sim.get_statistics()
+
     @reader
     @auth
     def register_to_schedule(self, user, sch_id):
-        return self.schedules[int(sch_id)].register(user) 
+        return self.schedules[int(sch_id)].register(user)
 
     ################################### STOPS START #############################
     @reader
@@ -156,8 +176,9 @@ class BusSys(Singleton):
         This command is used to add a new stop
         """
         stop_id = self.schedules[int(sch_id)].add_stop(
-            int(edgeid), bool(directoin), int(percentage), description)
-        return f"The id of the new stop is {str(stop_id)} is added to the system\n"
+            int(edgeid), bool(directoin), int(percentage), description
+        )
+        return f"A new stop with id {str(stop_id)} is added to the system\n"
 
     @reader
     @auth
@@ -211,7 +232,8 @@ class BusSys(Singleton):
         This command is used to a stop to a specific route
         """
         status = self.schedules[int(sch_id)].add_stop_to_route(
-            int(routeid), int(stop_id), int(wait_time))
+            int(routeid), int(stop_id), int(wait_time)
+        )
         return f"A stop with Stopid {stop_id} is added to route with id {routeid} in schedule {sch_id}\n"
 
     @reader
@@ -220,8 +242,7 @@ class BusSys(Singleton):
         """
         This command is used to remove a stop from a specific route
         """
-        self.schedules[int(sch_id)].del_stop_from_route(
-            int(routeid), int(stop_id))
+        self.schedules[int(sch_id)].del_stop_from_route(int(routeid), int(stop_id))
         return f"A stop with Stopid {stop_id} is deleted from route {routeid} in schedule {sch_id}\n"
 
     @reader
@@ -231,7 +252,8 @@ class BusSys(Singleton):
         This command is used to change the wait time of a stop insied a route
         """
         self.schedules[int(sch_id)].change_stop_wait(
-            int(routeid), int(stop_id), int(wait_time))
+            int(routeid), int(stop_id), int(wait_time)
+        )
         return f"A stop with Stopid {stop_id} is in route with {routeid} in schedule {sch_id}, wait time is chaned to {wait_time}\n"
 
     ############################# Routes END #########################
@@ -239,13 +261,27 @@ class BusSys(Singleton):
     ############################# LINES START ################################
     @reader
     @auth
-    def add_line(self, user, sch_id, name, start_time, end_time, time_between_trips, routeid, description):
+    def add_line(
+        self,
+        user,
+        sch_id,
+        name,
+        start_time,
+        end_time,
+        time_between_trips,
+        routeid,
+        description,
+    ):
         """
         This command is used to add a line to the system
         """
         lineid = self.schedules[int(sch_id)].addline(
-            name, int(start_time), int(end_time), int(
-                time_between_trips), int(routeid), description
+            name,
+            int(start_time),
+            int(end_time),
+            int(time_between_trips),
+            int(routeid),
+            description,
         )
         return f"A new line with lineid {lineid} is added to the system\n"
 
@@ -265,7 +301,7 @@ class BusSys(Singleton):
 
     @reader
     @auth
-    def del_line(self, user, sch_id,  lineid):
+    def del_line(self, user, sch_id, lineid):
         """
         This command is used to delete line from the system
         """
@@ -283,12 +319,13 @@ class BusSys(Singleton):
 
     @reader
     @auth
-    def update_line_start_time(self, user, sch_id,  lineid, new_start_time):
+    def update_line_start_time(self, user, sch_id, lineid, new_start_time):
         """
         This command is used to update line start time
         """
         self.schedules[int(sch_id)].update_line_start_time(
-            int(lineid), int(new_start_time))
+            int(lineid), int(new_start_time)
+        )
         return f"Line with lineid {lineid} in schedule with id {sch_id} is start time is changed to {new_start_time}\n"
 
     @reader
@@ -299,8 +336,7 @@ class BusSys(Singleton):
         ex
         update_line_end_time lineid new_end_time
         """
-        self.schedules[int(sch_id)].update_line_end_time(
-            int(lineid), int(new_end_time))
+        self.schedules[int(sch_id)].update_line_end_time(int(lineid), int(new_end_time))
         return f"Line with lineid {lineid} in schedule with id {sch_id} is end time is changed to {new_end_time}\n"
 
     @reader
@@ -310,7 +346,8 @@ class BusSys(Singleton):
         This command is used to update line start time
         """
         self.schedules[int(sch_id)].update_line_time_between_trips(
-            int(lineid), int(time_between_trips))
+            int(lineid), int(time_between_trips)
+        )
         return f"Line with lineid {lineid} in schedule with id {sch_id} is time between trips is changed to {time_between_trips}\n"
 
     @reader
@@ -319,8 +356,7 @@ class BusSys(Singleton):
         """
         This command is used to update line start time
         """
-        self.schedules[int(sch_id)].update_line_start_time(
-            int(lineid), description)
+        self.schedules[int(sch_id)].update_line_start_time(int(lineid), description)
         return f"Line with lineid {lineid} in schedule with id {sch_id} is description is changed to {description}\n"
 
     @reader
@@ -346,6 +382,7 @@ class BusSys(Singleton):
     ############################# LINES END ################################
 
     ############################# TESTING ##################################
+
 
 #     @writer
 #     @auth

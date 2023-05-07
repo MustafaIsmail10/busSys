@@ -55,12 +55,17 @@ class User:
 
     def get_notifications(self):
         with self.mutex:
-            if len(self.messages) == 0:
+            while len(self.messages) == 0:
                 self.wait_notification.wait()
-            else :
-                new_messages = self.messages
-                self.messages = []
-                return new_messages
+            
+            new_messages = self.messages
+            self.messages = []
+            msg = ""
+            for m in new_messages:
+                new_msg = f"New Message\n"
+                new_msg += str(m) + "\n"
+                msg += new_msg
+            return msg
 
 
     def notify(self, msg):

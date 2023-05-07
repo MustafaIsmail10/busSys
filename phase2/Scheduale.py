@@ -176,7 +176,16 @@ class Schedule:
 
 
     def __str__(self):
-        return f"The name of the schedule is {self.name} and id is {self.id}\nThe Lines are {self.lines}\nThe Routes are {self.routes}\n"
+        return f"The name of the schedule is {self.name} and its id is {self.id}\nThe Lines are {self.lines.keys()}\nThe Routes are {self.routes.keys()}"
+
+
+    def stops_within_r(self, stopid, radius):
+        return self.map.stops_within_r(stopid, radius)
+
+
+
+
+
 # if __name__ == "__main__":
 #     my_map = Map(path="./test/test_map.json")
 #     my_schedule = Schedule(my_map)
