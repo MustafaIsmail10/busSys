@@ -8,6 +8,8 @@ BusSys is a collaborative bus route designer
 
 # Running phase 2
 
+Change directory to phase 2 `cd phase2` 
+
 Enter the following command to run the server `python3 Server.py --port <port number>`
 
 Enter the following command to run clients `nc -v localhost <port number>`
