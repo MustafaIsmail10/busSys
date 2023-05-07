@@ -368,6 +368,11 @@ class Map:
         return min_stop
 
     def stops_within_r(self, location, radius):
+        '''
+        This function finds all stop that are at a
+        radius k away from the given location, if they exist
+        and returns them as a list
+        '''
         stops = []
         for stop in self.bus_stops:
             temp_dist = self.dist(self.bus_stops[stop].get_location(), location)
@@ -384,6 +389,9 @@ class Map:
         return msg
 
     def get_stops(self):
+        '''
+        returns all bus stops in map
+        '''
         return self.bus_stops
 
 

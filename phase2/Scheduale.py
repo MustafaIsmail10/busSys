@@ -168,6 +168,9 @@ class Schedule:
 
 
     def is_bus_at_stop(self, lineid, stopid, curr_time):
+        '''
+        Checks if bus is at the stop, returns a tuple containing bus number and a boolean value
+        '''
         return self.lines[lineid].is_bus_at_stop(stopid, curr_time)
 
 
@@ -180,6 +183,10 @@ class Schedule:
 
 
     def stops_within_r(self, stopid, radius):
+        '''
+        returns list of all stop that are at a
+        radius k away from the given location, if they exist
+        '''
         return self.map.stops_within_r(stopid, radius)
 
 
@@ -188,10 +195,17 @@ class Schedule:
     
 
     def get_line_distance(self, lineid):
+        """
+        Returns whole distance covered by route of Line with given line id .
+
+        """
         return self.lines[lineid].get_line_distance()
 
 
     def get_line_distance_until_stop(self, lineid, stopid):
+        '''
+        Finds the distance to a stop with given stop id of the line with given line id
+        '''
         return self.lines[lineid].get_distance_until_stop(stopid)
 
 

@@ -16,12 +16,19 @@ class Server():
         self.busSys = BusSys()
 
     def parse(self, req):
+        '''
+        Parses command given by user in the sense that
+        it transforms the command into data that can be passed
+        to our functions in our system
+        '''
         # remove trailing newline and blanks
         req = req.rstrip()
         r = req.decode().split()
         result = []
         i = 0
-        while i < len(r):
+        while i < len(r): 
+        # handling the part where strings with spaces are passed and
+        # we need them to remain as they are, not seperated 
             if r[i][0] == '"':
                 string = ""
                 while r[i][-1] != '"':
@@ -33,9 +40,16 @@ class Server():
             else:
                 result.append(r[i])
             i += 1
+        # result is a list of the command and the arguments 
         return result
 
     def handle_auth(self, sock, user):
+        '''
+        This part checks if the user wants sign up or login
+        to continue and be able to access the functions and send commands.
+        If anything other than sign up or login is sent, the user is prompted
+        to try again and they wont have access until they enter the correct form.
+        '''
         req = sock.recv(1000)
         while req and req != '':
             parsed = self.parse(req)
@@ -50,6 +64,13 @@ class Server():
                 req = sock.recv(1000)
 
     def handle_req(self, req, user, token):
+        '''
+        Takes the parsed user request
+        and calls the underlying function
+        in our system if the command is valid
+        then sends back the result to
+        the user_cmd function
+        '''
         result = None
         try:
             func = getattr(self.busSys, req[0])
@@ -65,6 +86,12 @@ class Server():
         return str(result)
 
     def agent(self, ns):
+        '''
+        Creates a new user
+        This thread divides into two threads:
+        one handles the user commands and replies to them,
+        the other sends notifications if there are any new updates
+        '''
         user = User()
         ns.send("new here? type sign up , otherwise type login \n".encode())
         token = self.handle_auth(ns, user)
@@ -75,6 +102,10 @@ class Server():
         task2.start()
 
     def user_cmd(self, sock, user, token):
+        '''
+        Handles user requests and gets response or result
+        from the handle_req function and sends it back to user
+        '''
         req = sock.recv(1000)
         while req and req != '':
             parsed = self.parse(req)
@@ -83,11 +114,21 @@ class Server():
             req = sock.recv(1000)
 
     def notif_handler(self, sock, user, token):
+        '''
+        Sends notifictions whenever there are new updates for this user
+        '''
         while True:
             notificatoins = user.get_notifications()
             sock.send(str(notificatoins).encode())
 
     def server(self):
+        '''
+        Heart of the program
+        creates a TCP socket and binds to it
+        then starts listening.
+        As soon as a user connects, it starts
+        a new agent thread to handle this new user'''
+        # this user is for testing
         user = User()
         token = user.login()
         # TESTING START
@@ -188,6 +229,9 @@ class Server():
 
 
 def main():
+    '''
+    Create the server and run it
+    '''
     s = Server(int(sys.argv[2]))
     try:
         s.server()

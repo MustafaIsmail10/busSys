@@ -126,6 +126,9 @@ class Line:
         return str(self.get_info())
 
     def is_bus_at_stop(self, stopid, curr_time):
+        '''
+        Checks if bus is at the stop, returns a tuple containing bus number and a boolean value
+        '''
         stop_pass_times = self.get_stop_pass_times(stopid)
         for i in range(len(stop_pass_times)):
             if curr_time < stop_pass_times[i]+ self.route.get_stop_wait(stopid) and curr_time > stop_pass_times[i]:
@@ -145,8 +148,14 @@ class Line:
     
 
     def get_line_distance(self):
+        """
+        Returns whole distance covered by route of Line.
+        """
         return self.route.get_distance()
     
 
     def get_distance_until_stop(self, stopid):
+        '''
+        Finds the distance to a stop with given stop id
+        '''
         return self.route.get_distance_until_stop(stopid)

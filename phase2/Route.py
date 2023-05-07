@@ -145,6 +145,9 @@ class Route:
     
 
     def get_distance_until_stop(self, stopid):
+        '''
+        Finds the distance to a stop with given stop id
+        '''
         stop1 = self.start
         dist = 0
         for i in range(1, len(self.orderedStops)):
