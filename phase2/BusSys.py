@@ -8,6 +8,9 @@ from Simulator import Simulator
 
 
 def auth(method):
+    """
+    This decorator is used to handle authorization in the system by comparing the passed tokens and the user token
+    """
     def f(self, user, token, *args, **kwargs):
         if user.is_authenticated(token):
             return method(self, user, *args, **kwargs)
@@ -28,7 +31,7 @@ class Singleton:
 
 class BusSys(Singleton):
     """
-    This class shall be the main controller of the system
+    This class shall be the main controller of the system. It's a singiliton class and uses reader/writers kind of snyc
     """
 
     def __init__(self):
@@ -41,6 +44,9 @@ class BusSys(Singleton):
         self.read_count = 0
 
     def reader(func):
+        """
+        This is a decorator used to mark functions that can be read by multiple threads in paralled
+        """
         def synchronize(self, *args, **kwargs):
             self.sem.acquire()
             self.read_count += 1
@@ -58,6 +64,9 @@ class BusSys(Singleton):
         return synchronize
 
     def writer(func):
+        """
+        This is a decorator used to mark functions that when accessed by a thread no more threads can access bussys 
+        """
         def synchronize(self, *args, **kwargs):
             self.write.acquire()
             res = func(self, *args, **kwargs)
@@ -68,6 +77,9 @@ class BusSys(Singleton):
 
     @writer
     def add_user(self, user):
+        """
+        When adding new user. Since this manipulates a data structue that can accessed by many threads. When any thread is executing this method all other threads are suspended
+        """
         if user.get_id():
             return
         else:
@@ -79,6 +91,11 @@ class BusSys(Singleton):
     @writer
     @auth
     def add_map(self, user, type, mmap):
+        """
+        This function is used to add a map to the system. Type indicates the type of input
+        type = 0 for path of the map on the server
+        type = 1 for a map given as a json string 
+        """
         new_id = self.ids
         self.ids += 1
         kwargs = None
@@ -95,12 +112,18 @@ class BusSys(Singleton):
     @reader
     @auth
     def get_map(self, user, map_id):
+        """
+        This function is used to get a map with a specific id 
+        """
         resutl = str(self.maps[int(map_id)])
         return resutl
 
     @reader
     @auth
     def get_maps(self, user):
+        """
+        This function is used to get all the maps in the system
+        """
         result = ""
         for mapid in self.maps:
             result += f"{str(self.maps[mapid])}\n\n "
@@ -109,6 +132,9 @@ class BusSys(Singleton):
     @reader
     @auth
     def register_to_map(self, user, mapid):
+        """
+        This function is used by a user to register himself to a map in the system
+        """
         self.maps[int(mapid)].register(user)
         return f"You are registered to map with id {mapid}\n"
 
@@ -116,6 +142,9 @@ class BusSys(Singleton):
     @writer
     @auth
     def add_schedule(self, user, map_id, name):
+        """
+        This function is used to add a new schedule to the system
+        """
         new_id = self.ids
         self.ids += 1
         new_schedule = ScheduleProxy(user, self.maps[int(map_id)], name, new_id)
@@ -135,7 +164,7 @@ class BusSys(Singleton):
     @auth
     def get_schedules(self, user):
         """
-        Returns a specific schedule
+        Returns all schedules in the system
         """
         result = ""
         for sch_id in self.schedules:
@@ -145,6 +174,9 @@ class BusSys(Singleton):
     @reader
     @auth
     def simulate(self, user, sch_id, start_time, end_time):
+        """
+        This fucntion is used to run the simulator. It takes schedule id ,start time,and end time as inputs
+        """
         sim = Simulator(user, self.schedules[int(sch_id)], int(start_time), int(end_time))
         sim.run()
         return sim.get_statistics()
@@ -152,6 +184,9 @@ class BusSys(Singleton):
     @reader
     @auth
     def register_to_schedule(self, user, sch_id):
+        """
+        This function is used by a user to register to a specific schedule
+        """
         return self.schedules[int(sch_id)].register(user)
 
     ################################### STOPS START #############################

@@ -6,6 +6,10 @@ import utilities as ut
 
 
 class Passenger:
+    """
+    This class is used by the passenger thread to imitaite a real passnger in the simulation
+    The main function that passenger simulation threads run is run method
+    """
     def __init__(
         self,
         pid,
@@ -36,6 +40,9 @@ class Passenger:
 
     # wait for bus
     def wait_bus(self):
+        """
+        This method is used by passenger to wait until buss arrives at source station
+        """
         with self.mutex:
             # must add to waiting list in bus sys?
             # return wait_time
@@ -45,27 +52,42 @@ class Passenger:
             # self.time_waited = ?
 
     def wait_travel(self):
+        """
+        This method is used by passenger to wait till bus arrived target station
+        """
         with self.mutex:
             self.status = "In bus"
             self.arriveStop.wait()
 
 
     def bus_came(self):
+        """
+        This method is used by simulator to notify passenger that the bus has arrived to start station
+        """
         with self.mutex:
             self.cond.notify()
             return (self.in_bus_time, self.start_waiting_time)
 
     def bus_arrived(self):
+        """
+        The method is used by simulator class to notify passenger that the bus has arrived its targer station
+        """
         with self.mutex:
             self.arriveStop.notify()
 
     def walk(self, loc1, loc2, status):
+        """
+        This fucntion is used to handle the walking of a passenger, It calcuates walking time and sleep for that time
+        """
         self.status = status
         walking_time = abs(ut.dist(loc2, loc1)) / (30 / 60)
         #### TESTING #######################
         sleep(walking_time *.2)
 
     def time_between_stops(self, line, stopid1, stopid2):
+        """
+        This function is used to calculate the time between start and target stops using a specific line 
+        """
         all_times = line.get_stops_data()
         # print(all_times)
         # print("times",all_times)
@@ -82,6 +104,11 @@ class Passenger:
 
     # takes 2 lists
     def shortest_route(self, stops1, stops2):
+        """
+        This function finds the shortest line to be taken by the passenger 
+        It searches all combination of source and target stops to find the most suitable route
+        It then compares selected lines and finds the one with minimum time and returns that one
+        """
         if stops1 == [] or stops2 == []:
             return (None, None)
         selected_lines = []
@@ -121,6 +148,17 @@ class Passenger:
         return (stop1_loc, stop2_loc)  # returns stop 1 and 2 locations in a tuple
 
     def run(self):
+        """
+        This is the main method of passenger threads 
+        The passenger first searches for the nearest stops 
+        Passnger the walks to the stop with min route time
+        Passneger waits for the bus to come
+        After the bus comes passenger enters the bus
+        After that passenger waits until the bus arrives the target station
+        Passenger leaves the bus and walks to the tagret location
+        """
+        
+        # getting bus stops near start and target locations
         stops_around_start = self.schedule.stops_within_r(self.start, self.radius)
         stops_around_target = self.schedule.stops_within_r(self.target, self.radius)
         
@@ -129,6 +167,7 @@ class Passenger:
         
         # print("closest to start",stops_around_start)
         # print("closest to end",stops_around_target)
+        # Finding the shortest line to take
         shortest = self.shortest_route(stops_around_start, stops_around_target)
         
         
@@ -136,17 +175,19 @@ class Passenger:
             self.simul.remove_passenger(self)
             return
         sleep(.5)
-        
+        # Walking to the target bus station
         self.walk(self.current_location, shortest[0], f"Walking to Bus Station with id {self.start_stop}")
         
         if (self.is_exit):
             return
+        # waiting for the bus to come
         self.wait_bus()
         if (self.is_exit):
             return
-        
+        # wating to arrive at target station
         self.wait_travel()
         self.current_location = shortest[1]
+        # walking from target station to target location
         self.walk(shortest[1], self.target, f"Walking from Bus Station with id {self.start_stop} to target location")
         
         if (self.is_exit):
@@ -157,15 +198,24 @@ class Passenger:
         return
 
     def print_status(self):
+        """
+        This function is used by simulator class to print the current status of passnger thread
+        """
         with self.mutex:
             print(f"Passenger with id {self.id} has staus: {self.status}")
 
     def exit_signel(self):
+        """
+        This function is used by simulator class to notify passnger that the simulation has ended
+        """
         with self.mutex:
             self.is_exit = True
             self.arriveStop.notify()
             self.cond.notify()
 
     def get_status(self):
+        """
+        This function is used by simulator class to get the status of passneger
+        """
         with self.mutex:
             return f"Passenger with id {self.id} has staus: {self.status}"
