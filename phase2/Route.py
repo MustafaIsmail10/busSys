@@ -112,7 +112,7 @@ class Route:
         #  the second element in result is that time when start is reached again
         return route[-1][1]
 
-    def get_distance(self, map):
+    def get_distance(self):
         """
         Takes in a map.
         Returns whole distance covered by route.
@@ -142,3 +142,16 @@ class Route:
 
     def __str__(self) -> str:
         return f"routeid: {self.id}, stops: {self.get_stops_data()}"
+    
+
+    def get_distance_until_stop(self, stopid):
+        stop1 = self.start
+        dist = 0
+        for i in range(1, len(self.orderedStops)):
+            if stop1 == stopid:
+                break
+            stop2 = self.orderedStops[i]
+            dist += self.map.stoptimeDistance(stop1, stop2)[0]
+            stop1 = stop2
+        return dist
+

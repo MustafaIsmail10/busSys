@@ -183,7 +183,16 @@ class Schedule:
         return self.map.stops_within_r(stopid, radius)
 
 
+    def get_journey_times(self, lineid):
+        return self.lines[lineid].get_journey_times()
+    
 
+    def get_line_distance(self, lineid):
+        return self.lines[lineid].get_line_distance()
+
+
+    def get_line_distance_until_stop(self, lineid, stopid):
+        return self.lines[lineid].get_distance_until_stop(stopid)
 
 
 # if __name__ == "__main__":

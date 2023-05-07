@@ -32,6 +32,7 @@ class Passenger:
         self.selected_line = None
         self.simul = simul
         self.is_exit = False
+        self.start_waiting_time = 0
 
     # wait for bus
     def wait_bus(self):
@@ -39,7 +40,7 @@ class Passenger:
             # must add to waiting list in bus sys?
             # return wait_time
             self.status = "Waiting bus"
-            self.simul.add_to_waiting(self, self.selected_line, self.start_stop)
+            self.start_waiting_time = self.simul.add_to_waiting(self, self.selected_line, self.start_stop)
             self.cond.wait()
             # self.time_waited = ?
 
@@ -52,7 +53,7 @@ class Passenger:
     def bus_came(self):
         with self.mutex:
             self.cond.notify()
-            return self.in_bus_time
+            return (self.in_bus_time, self.start_waiting_time)
 
     def bus_arrived(self):
         with self.mutex:

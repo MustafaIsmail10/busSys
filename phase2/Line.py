@@ -127,10 +127,26 @@ class Line:
 
     def is_bus_at_stop(self, stopid, curr_time):
         stop_pass_times = self.get_stop_pass_times(stopid)
-        for stop_time in stop_pass_times:
-            if curr_time < stop_time+ self.route.get_stop_wait(stopid) and curr_time > stop_time:
-                return True     
-        return False
+        for i in range(len(stop_pass_times)):
+            if curr_time < stop_pass_times[i]+ self.route.get_stop_wait(stopid) and curr_time > stop_pass_times[i]:
+                return (i +1, True)     
+        return (None, False)
+    
+    def get_journey_times(self):
+        start_times = []
+        curr_time = self.start_time
+        while curr_time < self.end_time:
+            start_times.append(curr_time)
+            curr_time += self.time_between_trips
+        return start_times
 
     def get_stops_data(self):
         return self.route.get_stops_data()
+    
+
+    def get_line_distance(self):
+        return self.route.get_distance()
+    
+
+    def get_distance_until_stop(self, stopid):
+        return self.route.get_distance_until_stop(stopid)

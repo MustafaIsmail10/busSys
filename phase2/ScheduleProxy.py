@@ -162,6 +162,18 @@ class ScheduleProxy():
     def __str__(self):
         return str(self._schedule)
 
+    @synched
+    def get_journey_times(self, lineid):
+        return self._schedule.get_journey_times(lineid)
+    
+    @synched
+    def get_line_distance(self, lineid):
+        return self._schedule.get_line_distance(lineid)
+    
+    @synched
+    def get_line_distance_until_stop(self, lineid, stopid):
+        return self._schedule.get_line_distance_until_stop(lineid, stopid)
+
 # kwargs = {"path": "./test/test_map.json"}
 # t = ScheduleProxy(Map( 1, **kwargs),"toto",0)
 # t.test()
