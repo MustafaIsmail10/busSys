@@ -1,2 +1,24 @@
-<!-- templates/home.html -->
-<h1>Homepage</h1>
+{% extends "base.html" %}
+{% block title %}Home{% endblock title %}
+
+
+{% block content %}
+
+
+{% if user.is_authenticated %}
+
+Authenticated user
+
+
+
+
+
+
+{% else %}
+<h1 class="text-center ">Welcome to one of the best talent Finders</h1>
+
+{% endif %}
+
+
+
+{% endblock content %}
