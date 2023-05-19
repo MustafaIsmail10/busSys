@@ -1,24 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock title %}
-
-
 {% block content %}
 
 
+
 {% if user.is_authenticated %}
-
-Authenticated user
-
-
-
-
-
-
+Welcome <h2>Hi {{ user.username }}!</h2> to the bussys
 {% else %}
-<h1 class="text-center ">Welcome to one of the best talent Finders</h1>
-
+<h2>Welcome to the best bus system in the world</h2> 
 {% endif %}
-
-
 
 {% endblock content %}

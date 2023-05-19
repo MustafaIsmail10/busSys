@@ -6,7 +6,8 @@ from django.views.generic import TemplateView
 class Home(TemplateView):
     template_name = "home.html"
 
-
+def Simulation(reqest):
+    pass
 
 def login(request):
     return render(request, 'login.html')
