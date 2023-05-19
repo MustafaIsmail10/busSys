@@ -15,6 +15,7 @@ class Server():
         self.sock = None
         self.busSys = BusSys()
 
+
     def parse(self, req):
         '''
         Parses command given by user in the sense that
@@ -43,7 +44,7 @@ class Server():
         # result is a list of the command and the arguments 
         return result
 
-    def handle_auth(self, sock, user):
+    def handle_auth(self, sock):
         '''
         This part checks if the user wants sign up or login
         to continue and be able to access the functions and send commands.
@@ -51,17 +52,25 @@ class Server():
         to try again and they wont have access until they enter the correct form.
         '''
         req = sock.recv(1000)
-        while req and req != '':
-            parsed = self.parse(req)
-            if parsed[0] == "login":
-                token = user.login()
-                return token
-            elif parsed[0] == "sign":
-                token = user.login()
-                return token
-            else:
-                sock.send("try again \n".encode())
-                req = sock.recv(1000)
+
+        parsed = self.parse(req)
+        if parsed[0] == "login":
+            if len(parsed) < 3:
+                return (None, None)
+            user, token = self.busSys.login(parsed[1], parsed[2])
+            return (user, token)
+        elif parsed[0] == "register":
+            if len(parsed) < 3:
+                return (None, None)
+            user, token = self.busSys.register(parsed[1], parsed[2])
+            return (user,token)
+        elif parsed[0] == "auToken":
+            if len(parsed) < 2:
+                return (None, None)
+            user = self.busSys.login_with_token(parsed[1])
+            return (user, parsed[1])
+        else:
+            return (None, None)
 
     def handle_req(self, req, user, token):
         '''
@@ -73,6 +82,8 @@ class Server():
         '''
         result = None
         try:
+            if (req[0] == "close"):
+                return None
             func = getattr(self.busSys, req[0])
             result = func(user, token, *req[1:])
         except AttributeError:
@@ -92,9 +103,13 @@ class Server():
         one handles the user commands and replies to them,
         the other sends notifications if there are any new updates
         '''
-        user = User()
-        ns.send("new here? type sign up , otherwise type login \n".encode())
-        token = self.handle_auth(ns, user)
+        ns.send("new here? type register , otherwise type login or auToken \n".encode())
+        user, token = self.handle_auth(ns)
+        if (not user or not token):
+            ns.send("Authentication Error\n".encode())
+            ns.close()
+            return 
+        ns.send((str(token)+ "\n").encode())
         # call auth here
         task1 = Thread(target=self.user_cmd,  args=(ns, user, token))
         task2 = Thread(target=self.notif_handler, args=(ns, user, token))
@@ -110,6 +125,10 @@ class Server():
         while req and req != '':
             parsed = self.parse(req)
             handled_req_response = self.handle_req(parsed, user, token)
+            if handled_req_response == None:
+                sock.send("Goodbye".encode())
+                sock.close()
+                return 
             sock.send(handled_req_response.encode())
             req = sock.recv(1000)
 
@@ -129,86 +148,86 @@ class Server():
         As soon as a user connects, it starts
         a new agent thread to handle this new user'''
         # this user is for testing
-        user = User()
-        token = user.login()
+
+        user, token = self.busSys.register("admin", "admin")
         # TESTING START
         self.busSys.add_map(user, token, 0, "./test/test_map.json")
-        self.busSys.add_schedule(user, token, 0, "The First one")
+        self.busSys.add_schedule(user, token, 1, "The First one")
 
-        self.busSys.add_stop(user, token, 1, 1, True, 20, "S11")
-        self.busSys.add_stop(user, token, 1, 1, False, 80, "S12")
+        self.busSys.add_stop(user, token, 2, 1, True, 20, "S11")
+        self.busSys.add_stop(user, token, 2, 1, False, 80, "S12")
 
-        self.busSys.add_stop(user, token, 1, 2, True, 20, "S21")
-        self.busSys.add_stop(user, token, 1, 2, False, 80, "S22")
+        self.busSys.add_stop(user, token, 2, 2, True, 20, "S21")
+        self.busSys.add_stop(user, token, 2, 2, False, 80, "S22")
 
-        self.busSys.add_stop(user, token, 1, 3, True, 20, "S31")
-        self.busSys.add_stop(user, token, 1, 3, False, 80, "S32")
+        self.busSys.add_stop(user, token, 2, 3, True, 20, "S31")
+        self.busSys.add_stop(user, token, 2, 3, False, 80, "S32")
 
-        self.busSys.add_stop(user, token, 1, 4, True, 20, "S41")
-        self.busSys.add_stop(user, token, 1, 4, False, 80, "S42")
+        self.busSys.add_stop(user, token, 2, 4, True, 20, "S41")
+        self.busSys.add_stop(user, token, 2, 4, False, 80, "S42")
 
-        self.busSys.add_stop(user, token, 1, 5, True, 20, "S51")
-        self.busSys.add_stop(user, token, 1, 5, False, 80, "S52")
+        self.busSys.add_stop(user, token, 2, 5, True, 20, "S51")
+        self.busSys.add_stop(user, token, 2, 5, False, 80, "S52")
 
-        self.busSys.add_stop(user, token, 1, 6, True, 20, "S61")
-        self.busSys.add_stop(user, token, 1, 6, False, 80, "S62")
+        self.busSys.add_stop(user, token, 2, 6, True, 20, "S61")
+        self.busSys.add_stop(user, token, 2, 6, False, 80, "S62")
 
-        self.busSys.add_stop(user, token, 1, 7, True, 20, "S71")
-        self.busSys.add_stop(user, token, 1, 7, False, 80, "S72")
+        self.busSys.add_stop(user, token, 2, 7, True, 20, "S71")
+        self.busSys.add_stop(user, token, 2, 7, False, 80, "S72")
 
-        self.busSys.add_stop(user, token, 1, 8, True, 20, "S81")
-        self.busSys.add_stop(user, token, 1, 8, False, 80, "S82")
+        self.busSys.add_stop(user, token, 2, 8, True, 20, "S81")
+        self.busSys.add_stop(user, token, 2, 8, False, 80, "S82")
 
-        self.busSys.add_stop(user, token, 1, 9, True, 20, "S91")
-        self.busSys.add_stop(user, token, 1, 9, False, 80, "S92")
+        self.busSys.add_stop(user, token, 2, 9, True, 20, "S91")
+        self.busSys.add_stop(user, token, 2, 9, False, 80, "S92")
 
-        self.busSys.add_stop(user, token, 1, 10, True, 20, "S101")
-        self.busSys.add_stop(user, token, 1, 10, False, 80, "S102")
+        self.busSys.add_stop(user, token, 2, 10, True, 20, "S101")
+        self.busSys.add_stop(user, token, 2, 10, False, 80, "S102")
 
-        self.busSys.add_route(user, token, 1)
-        self.busSys.add_stop_to_route(user, token, 1, 1, 1, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 1, 10, 3)
-        self.busSys.add_stop_to_route(user, token, 1, 1, 12, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 1, 20, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 1, 4, 4)
+        self.busSys.add_route(user, token, 2)
+        self.busSys.add_stop_to_route(user, token, 2, 1, 1, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 1, 10, 3)
+        self.busSys.add_stop_to_route(user, token, 2, 1, 12, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 1, 20, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 1, 4, 4)
 
-        self.busSys.add_route(user, token, 1)
-        self.busSys.add_stop_to_route(user, token, 1, 2, 6, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 2, 16, 5)
-        self.busSys.add_stop_to_route(user, token, 1, 2, 8, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 2, 18, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 2, 19, 4)
+        self.busSys.add_route(user, token, 2)
+        self.busSys.add_stop_to_route(user, token, 2, 2, 6, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 2, 16, 5)
+        self.busSys.add_stop_to_route(user, token, 2, 2, 8, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 2, 18, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 2, 19, 4)
 
-        self.busSys.add_route(user, token, 1)
-        self.busSys.add_stop_to_route(user, token, 1, 3, 17, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 3, 9, 5)
-        self.busSys.add_stop_to_route(user, token, 1, 3, 2, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 3, 6, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 3, 16, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 3, 8, 4)
+        self.busSys.add_route(user, token, 2)
+        self.busSys.add_stop_to_route(user, token, 2, 3, 17, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 3, 9, 5)
+        self.busSys.add_stop_to_route(user, token, 2, 3, 2, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 3, 6, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 3, 16, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 3, 8, 4)
 
-        self.busSys.add_route(user, token, 1)
-        self.busSys.add_stop_to_route(user, token, 1, 4, 5, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 4, 9, 5)
-        self.busSys.add_stop_to_route(user, token, 1, 4, 7, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 4, 3, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 4, 1, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 4, 16, 4)
+        self.busSys.add_route(user, token, 2)
+        self.busSys.add_stop_to_route(user, token, 2, 4, 5, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 4, 9, 5)
+        self.busSys.add_stop_to_route(user, token, 2, 4, 7, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 4, 3, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 4, 1, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 4, 16, 4)
 
 
-        self.busSys.add_route(user, token, 1)
-        self.busSys.add_stop_to_route(user, token, 1, 5, 7, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 5, 17, 5)
-        self.busSys.add_stop_to_route(user, token, 1, 5, 20, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 5, 12, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 5, 11, 4)
-        self.busSys.add_stop_to_route(user, token, 1, 5, 13, 4)
+        self.busSys.add_route(user, token, 2)
+        self.busSys.add_stop_to_route(user, token, 2, 5, 7, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 5, 17, 5)
+        self.busSys.add_stop_to_route(user, token, 2, 5, 20, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 5, 12, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 5, 11, 4)
+        self.busSys.add_stop_to_route(user, token, 2, 5, 13, 4)
         
-        self.busSys.add_line(user, token, 1, "Blue Ring", 120, 1400, 15, 1, "This is the blue line")
-        self.busSys.add_line(user, token, 1, "Red Ring", 500, 1400, 10, 2, "This is the red line")
-        self.busSys.add_line(user, token, 1, "Yellow Ring", 600, 1000, 20, 3, "This is the yellow line")
-        self.busSys.add_line(user, token, 1, "Green Ring", 100, 1200, 30, 4, "This is the green line")
-        self.busSys.add_line(user, token, 1, "Purple Ring", 160, 1300, 20, 5, "This is the purple line")
+        self.busSys.add_line(user, token, 2, "Blue Ring", 120, 1400, 15, 1, "This is the blue line")
+        self.busSys.add_line(user, token, 2, "Red Ring", 500, 1400, 10, 2, "This is the red line")
+        self.busSys.add_line(user, token, 2, "Yellow Ring", 600, 1000, 20, 3, "This is the yellow line")
+        self.busSys.add_line(user, token, 2, "Green Ring", 100, 1200, 30, 4, "This is the green line")
+        self.busSys.add_line(user, token, 2, "Purple Ring", 160, 1300, 20, 5, "This is the purple line")
         # TESTING END
         self.sock = socket(AF_INET, SOCK_STREAM)
         self.sock.bind(('0.0.0.0', self.port))

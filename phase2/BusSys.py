@@ -75,7 +75,6 @@ class BusSys(Singleton):
 
         return synchronize
 
-    @writer
     def add_user(self, user):
         """
         When adding new user. Since this manipulates a data structue that can accessed by many threads. When any thread is executing this method all other threads are suspended
@@ -87,6 +86,38 @@ class BusSys(Singleton):
             self.ids += 1
             user.change_id(new_id)
             self.users[new_id] = user
+    
+    @writer
+    def register(self, username, passwd):
+        user = User()
+        token = user.register(username, passwd)
+        self.add_user(user)
+        return (user, token)
+
+
+    @reader
+    def login(self, username, passwd):
+        """
+        This function is used to login a user with uesr_name and passwd
+        """
+        for user in self.users:
+            if username == self.users[user].get_username():
+                token =  self.users[user].login(passwd)
+                return (self.users[user], token)
+
+        return (None, None)
+    
+
+    @reader
+    def login_with_token(self, token):
+        """
+        This function is used to login a user with uesr_name and passwd
+        """
+        for user in self.users:
+            if self.users[user].is_authenticated(token):
+                return self.users[user]
+
+        return None
 
     @writer
     @auth

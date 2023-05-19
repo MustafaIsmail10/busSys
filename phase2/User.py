@@ -31,15 +31,17 @@ class User:
         '''
         return self.token == token and self.authorized
 
-    def login(self):
+    def login(self, password):
         '''
         Lets the already existing user log in and
         marks them as authorized to access our system.
         Also gives them a new token
         '''
-        self.token = uuid4()
-        self.authorized = True
-        return self.token
+        if self.passwd == password:
+            self.authorized = True
+            return self.token
+        else :
+            raise Exception("Wrong Password")
     
     def change_id (self, userid):
         '''
@@ -65,6 +67,9 @@ class User:
         self.token = uuid4()
         self.authorized = True
         return self.token
+
+    def get_username (self):
+        return self.username
 
     def logout(self):
         '''
