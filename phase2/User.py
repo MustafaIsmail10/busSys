@@ -30,7 +30,13 @@ class User:
         Checks if this user is authenticated
         '''
         return self.token == token and self.authorized
-
+    
+    def is_token(self, token):
+        '''
+        Checks if this user is authenticated
+        '''
+        return self.token == token 
+    
     def login(self, password):
         '''
         Lets the already existing user log in and

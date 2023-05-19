@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+{% if auth %}
+<h2>Welcome To The Simulation of bussys</h2>
+This simulation might take up to 10 mins to finish 
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label for="sch_num">Schedule Number To simulate:</label>
+        <input type="text" id="sch_num" name="sch_num" required>
+    </div>
+    <div>
+        <label for="start_time">Simulation start time:</label>
+        <input type="text" id="start_time" name="start_time" required>
+    </div>
+    <div>
+        <label for="end_time">Simulation end time:</label>
+        <input type="text" id="end_time" name="end_time" required>
+    </div>
+    <button type="submit">Login</button>
+</form>
+
+
+{% else %}
+<h2>You need to login</h2>
+{% endif %}
+
+{% endblock content %}

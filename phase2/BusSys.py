@@ -114,10 +114,17 @@ class BusSys(Singleton):
         This function is used to login a user with uesr_name and passwd
         """
         for user in self.users:
-            if self.users[user].is_authenticated(token):
+            if self.users[user].is_token(token):
+                print(self.users)
                 return self.users[user]
 
         return None
+
+
+    @reader
+    @auth
+    def get_username(self, user):
+        return str(user.get_username()) + "\n"
 
     @writer
     @auth

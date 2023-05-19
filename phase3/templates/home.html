@@ -3,8 +3,8 @@
 
 
 
-{% if user.is_authenticated %}
-Welcome <h2>Hi {{ user.username }}!</h2> to the bussys
+{% if auth %}
+Welcome <h2>Hi {{ username }}!</h2> to the bussys
 {% else %}
 <h2>Welcome to the best bus system in the world</h2> 
 {% endif %}

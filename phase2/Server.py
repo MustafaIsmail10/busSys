@@ -110,6 +110,7 @@ class Server():
             ns.close()
             return 
         ns.send((str(token)+ "\n").encode())
+        print(user, token)
         # call auth here
         task1 = Thread(target=self.user_cmd,  args=(ns, user, token))
         task2 = Thread(target=self.notif_handler, args=(ns, user, token))
@@ -127,6 +128,7 @@ class Server():
             handled_req_response = self.handle_req(parsed, user, token)
             if handled_req_response == None:
                 sock.send("Goodbye".encode())
+                print(sock)
                 sock.close()
                 return 
             sock.send(handled_req_response.encode())
