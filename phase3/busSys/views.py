@@ -111,19 +111,18 @@ def handle_form(request):
         print(auth)
         sock.send(toserver.encode())
         result = sock.recv(1000).decode().split("\n")
+        print(result)
+
         sock.send('close'.encode())
-        
-        i = 1
+        result = sock.recv(1000).decode().split("\n")
+        print(result)
         while(True):
-            if (result[1] == "closed"):
+            if (len(result)> 1 and result[1] == "closed"):
                 break
-            print(result, i)
+            print(result)
             result = sock.recv(1000).decode().split("\n")
-            i +=1
-        
-        sock.send(b'close')
-        
-    return render(request,'',context)        
+        sock.close()
+    return render(request,'home.html',context)        
             
 def design(request):
     token = request.session.get('token')

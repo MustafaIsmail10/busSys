@@ -68,10 +68,9 @@ class Server():
             user, token = self.busSys.register(parsed[1], parsed[2])
             return (user,token)
         elif parsed[0] == "auToken":
-            print("THE1")
             if len(parsed) < 2:
                 return (None, None)
-            print("parsed: ",parsed)
+            # print("parsed: ",parsed)
             user = self.busSys.login_with_token(parsed[1])
             #print(user)
             return (user, parsed[1])

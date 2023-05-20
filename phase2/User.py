@@ -29,13 +29,13 @@ class User:
         '''
         Checks if this user is authenticated
         '''
-        return self.token == token and self.authorized
+        return str(self.token) == str(token) and self.authorized
     
     def is_token(self, token):
         '''
         Checks if this user is authenticated
         '''
-        return self.token == token 
+        return str(self.token) == str(token) 
     
     def login(self, password):
         '''
@@ -45,7 +45,7 @@ class User:
         '''
         if self.passwd == password:
             self.authorized = True
-            return self.token
+            return str(self.token)
         else :
             raise Exception("Wrong Password")
     
@@ -72,7 +72,7 @@ class User:
         self.passwd = passwd
         self.token = uuid4()
         self.authorized = True
-        return self.token
+        return str(self.token)
 
     def get_username (self):
         return self.username
