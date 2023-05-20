@@ -110,7 +110,7 @@ class User:
             self.messages = []
             msg = ""
             for m in new_messages:
-                new_msg = f"New Message\n"
+                new_msg = f"New Message \n"
                 new_msg += str(m) + "\n"
                 msg += new_msg
             return msg

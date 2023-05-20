@@ -1,12 +1,11 @@
 from django.urls import path
-from .views import home, login,signout, simulate,design,stopOp,schedule,line,Map,route,handle_form
+from .views import home, login,signout, simulate,design,stopOp,schedule,line,Map,route,handle_form,display_result
 
 
 urlpatterns = [
     path("", home, name="home"),
     path('login/', login, name='login'),
     path("signup", login, name="signup"),
-    path("design", login, name="design"),
     path("simulate", simulate, name="simulate"),
     path("signout", signout, name="signout"),
     path("design/", design, name="design"),
@@ -16,4 +15,5 @@ urlpatterns = [
     path("design/map/", Map, name="map"),
     path("design/line/", line, name="line"),
     path('handle_form/', handle_form, name='handle_form'),
+    path("result/",display_result,name="result")
 ]

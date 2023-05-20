@@ -102,7 +102,7 @@ class Server():
             return f"ERROR {str(e)}\n"
         print("user", user)
         print(token)
-        return str(result)
+        return str(result)+"\n"
 
     def agent(self, ns, lst):
         '''

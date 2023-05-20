@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from socket import *
+from re import *
 # Create your views here.
 
 def home(request):
@@ -19,33 +20,31 @@ def simulate(request):
     if token:
         context['auth'] = True
         context['username'] = request.session.get("username")
-    if request.method == "POST":
-        return do_simulation(request, token, context)
     return render(request, 'simulation.html', context)
 
-def do_simulation(request, token, context):
-    simulation_data = request.POST
-    sch_num = simulation_data["sch_num"]
-    start_time = simulation_data["start_time"]
-    end_time = simulation_data["end_time"]
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.connect( ('127.0.0.1', 1445))
+# def do_simulation(request, token, context):
+#     simulation_data = request.POST
+#     sch_num = simulation_data["sch_num"]
+#     start_time = simulation_data["start_time"]
+#     end_time = simulation_data["end_time"]
+#     sock = socket(AF_INET, SOCK_STREAM)
+#     sock.connect( ('127.0.0.1', 1445))
     
-    result = sock.recv(1000)
-    sock.send(f'auToken {token}'.encode())
-    result = sock.recv(1000).decode().split("\n")[0]
-    print(result)
-    if result == "Authentication Error":
-        request.session['token'] = None
-        request.session['username'] = None 
-        return redirect('login')
-    print(result)
-    while(result):
-        print(result)
-        result = sock.recv(1000).decode().split("\n")[0]
-    sock.send(b'close')
+#     result = sock.recv(1000)
+#     sock.send(f'auToken {token}'.encode())
+#     result = sock.recv(1000).decode().split("\n")[0]
+#     print(result)
+#     if result == "Authentication Error":
+#         request.session['token'] = None
+#         request.session['username'] = None 
+#         return redirect('login')
+#     print(result)
+#     while(result):
+#         print(result)
+#         result = sock.recv(1000).decode().split("\n")[0]
+#     sock.send(b'close')
 
-    return render(request, 'simulation.html', context)
+#     return render(request, 'simulation.html', context)
 
 
 
@@ -110,20 +109,42 @@ def handle_form(request):
         auth = sock.recv(1000).decode().split("\n")[0]
         print(auth)
         sock.send(toserver.encode())
+        response_list = []
         result = sock.recv(1000).decode().split("\n")
-        print(result)
-
+        response_list.append(result)
         sock.send('close'.encode())
         result = sock.recv(1000).decode().split("\n")
-        print(result)
+        response_list.append(result)
         while(True):
             if (len(result)> 1 and result[1] == "closed"):
                 break
-            print(result)
+         
+            response_list.append(result)
             result = sock.recv(1000).decode().split("\n")
         sock.close()
-    return render(request,'home.html',context)        
-            
+        context['result_list'] = response_list
+    return display_result(request,context)        
+
+def display_result(request,context):
+    result_str =""
+    for lst in context['result_list']:
+        for elem in lst:
+            result_str+=elem
+    print("res str " ,result_str)
+    result_str = result_str.replace("New Message", "\nNew Message: ")
+    result_str = result_str.replace(" The", "$")
+    result_str = result_str.replace("The", "\nThe")
+    result_str = result_str.replace("$", " The")
+    result_str = sub(r"},", "}\n ",result_str)
+    result_str = result_str.replace("A", "\nA").split("\n")
+    # indices = [index for index in range(len(result_str)) if result_str.startswith('New', index)]
+    # print(indices)
+    # indices= indices.reverse()
+    # for i in indices:
+        
+    context['result_list'] = result_str
+    return render(request,'result.html',context)
+
 def design(request):
     token = request.session.get('token')
     context = {}
