@@ -10,7 +10,7 @@ def home(request):
     if token:
         context['auth'] = True
         context['username'] = request.session.get("username")
-        
+       
     return render(request, 'home.html', context)
 
 def simulate(request):
@@ -67,16 +67,17 @@ def login_post(request):
     sock.recv(1000)
     sock.send(f'login {username} {password}'.encode())
     token = sock.recv(1000).decode().split("\n")[0]
+    print(token)
     sock.send('close'.encode())
 
     result = sock.recv(1000).decode().split("\n")
-    i = 1
-    while(result[1] != "closed"):
-        print(result, i)
+    while True and result[0]:
+        if (len(result)>1 and result[1] == "closed"):
+            break
+        print(result)
         result = sock.recv(1000).decode().split("\n")
-        i +=1
         
-    sock.send(b'close')
+    sock.close()
     request.session['token'] = token
     request.session['username'] = login_data["username"]
     return redirect('home')
@@ -86,3 +87,99 @@ def signout(request):
     request.session['token'] = None
     request.session['username'] = None 
     return redirect('home')
+
+def handle_form(request):
+    token = request.session.get('token')
+    context = {}
+    print(token)
+    if token:
+        context['auth'] = True
+        context['username'] = request.session.get("username")
+    if request.method == 'POST':
+        toserver = ""
+        for key, value in request.POST.items():
+            if key=="csrfmiddlewaretoken": 
+                continue
+            toserver+= f' {value}'  
+        print(toserver)
+        sock = socket(AF_INET, SOCK_STREAM)
+        sock.connect(('127.0.0.1', 1445))
+        sock.recv(1000)
+        print(f'auToken {token}')
+        sock.send(f'auToken {token}'.encode())        
+        auth = sock.recv(1000).decode().split("\n")[0]
+        print(auth)
+        sock.send(toserver.encode())
+        result = sock.recv(1000).decode().split("\n")
+        sock.send('close'.encode())
+        
+        i = 1
+        while(True):
+            if (result[1] == "closed"):
+                break
+            print(result, i)
+            result = sock.recv(1000).decode().split("\n")
+            i +=1
+        
+        sock.send(b'close')
+        
+    return render(request,'',context)        
+            
+def design(request):
+    token = request.session.get('token')
+    context = {}
+    if token:
+        context['auth'] = True
+        context['username'] = request.session.get("username")
+       
+    return render(request, 'design.html', context)
+    
+def stopOp(request):
+    token = request.session.get('token')
+    print(token)
+    context = {}
+    if token:
+        context['auth'] = True
+        context['username'] = request.session.get("username")
+       
+    return render(request, 'stopOp.html', context)
+   
+    
+def route(request):
+    token = request.session.get('token')
+    context = {}
+    if token:
+        context['auth'] = True
+        context['username'] = request.session.get("username")
+       
+    return render(request, 'route.html', context)
+        
+def schedule(request):
+    token = request.session.get('token')
+    context = {}
+    if token:
+        context['auth'] = True
+        context['username'] = request.session.get("username")
+       
+    return render(request, 'schedule.html', context)
+    
+    
+def Map(request):
+    token = request.session.get('token')
+    context = {}
+    if token:
+        context['auth'] = True
+        context['username'] = request.session.get("username")
+       
+    return render(request, 'map.html', context)
+    
+    
+def line(request):
+    token = request.session.get('token')
+    context = {}
+    if token:
+        context['auth'] = True
+        context['username'] = request.session.get("username")
+       
+    return render(request, 'line.html', context)
+ 

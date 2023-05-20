@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if auth %}
+<h1>To add a Line:</h1>
+
+<form action="/handle_form/" method="post">
+
+    <input type="hidden" name="func_name" value="add_line">
+    {% csrf_token %}
+    <div>
+      <label for="scheduleid">Schedule id:</label>
+      <input type="text" id="sceduleid" name="sceduleid" required>
+    </div>
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+    <div>
+    <label for="start">Start time:</label>
+    <input type="text" id="start" name="start" required>
+    </div>
+    <div>
+        <label for="end">End time:</label>
+        <input type="text" id="end" name="end" required>
+      </div>
+    <div>
+        <label for="time">Time between trips:</label>
+        <input type="text" id="time" name="time" required>
+      </div>
+    <div>
+        <label for="routeid">Route id:</label>
+        <input type="text" id="routeid" name="routeid" required>
+      </div>
+    <div>
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" required>
+      </div>
+    
+    <button type="submit">Add a new Line</button>
+  </form>
+
+  <br>
+
+  <h1>To print all Lines :</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="get_lines">
+      {% csrf_token %}
+      <div>
+        <label for="sid">Schedule id:</label>
+        <input type="text" id="sid" name="sid" required>
+      </div>
+      <button type="submit">Get Lines of Schedule </button>
+  </form>
+  <br>
+
+    
+    <br>
+
+    <h1>To remove a Line:</h1>
+    <form action="/handle_form/" method="post">
+      <input type="hidden" name="func_name" value="del_line">
+      {% csrf_token %}
+      <div>
+        <label for="sch_id">Schedule id:</label>
+        <input type="text" id="sch_id" name="sch_id" required>
+      </div>
+      <div>
+          <label for="lineid">Line id:</label>
+          <input type="text" id="lineid" name="lineid" required>
+        </div>
+    
+        
+      <button type="submit">Delete Line</button>
+  </form>
+
+  <br>
+  <h1>To Update a Line's name:</h1>
+    <form action="/handle_form/" method="post">
+      <input type="hidden" name="func_name" value="update_line_name">
+      {% csrf_token %}
+      <div>
+        <label for="sch_id">Schedule id:</label>
+        <input type="text" id="sch_id" name="sch_id" required>
+      </div>
+      <div>
+          <label for="lineid">Line id:</label>
+          <input type="text" id="lineid" name="lineid" required>
+        </div>
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+      <button type="submit">Update Line name</button>
+  </form>
+
+  <br>
+  <h1>To Update a Line's start time:</h1>
+    <form action="/handle_form/" method="post">
+      <input type="hidden" name="func_name" value="update_line_start_time">
+      {% csrf_token %}
+      <div>
+        <label for="sch_id">Schedule id:</label>
+        <input type="text" id="sch_id" name="sch_id" required>
+      </div>
+      <div>
+          <label for="lineid">Line id:</label>
+          <input type="text" id="lineid" name="lineid" required>
+        </div>
+        <div>
+            <label for="start">Start time:</label>
+            <input type="text" id="start" name="start" required>
+            </div>
+          
+      <button type="submit">Update Line start time</button>
+  </form>
+
+  <br>
+  <h1>To Update a Line's end time:</h1>
+    <form action="/handle_form/" method="post">
+      <input type="hidden" name="func_name" value="update_line_end_time">
+      {% csrf_token %}
+      <div>
+        <label for="sch_id">Schedule id:</label>
+        <input type="text" id="sch_id" name="sch_id" required>
+      </div>
+      <div>
+          <label for="lineid">Line id:</label>
+          <input type="text" id="lineid" name="lineid" required>
+        </div>
+        <div>
+            <label for="end">End time:</label>
+            <input type="text" id="end" name="end" required>
+          </div>
+          
+      <button type="submit">Update Line end time</button>
+  </form>
+  <br>
+  
+  <h1>To Update a Line's time between trips:</h1>
+    <form action="/handle_form/" method="post">
+      <input type="hidden" name="func_name" value="update_line_time_between_trips">
+      {% csrf_token %}
+      <div>
+        <label for="sch_id">Schedule id:</label>
+        <input type="text" id="sch_id" name="sch_id" required>
+      </div>
+      <div>
+          <label for="lineid">Line id:</label>
+          <input type="text" id="lineid" name="lineid" required>
+        </div>
+        <div>
+            <label for="time">Time between trips:</label>
+            <input type="text" id="time" name="time" required>
+          </div>
+          
+      <button type="submit">Update Line time</button>
+  </form>
+<br>
+<h1>To Update a Line's description:</h1>
+    <form action="/handle_form/" method="post">
+      <input type="hidden" name="func_name" value="update_line_description">
+      {% csrf_token %}
+      <div>
+        <label for="sch_id">Schedule id:</label>
+        <input type="text" id="sch_id" name="sch_id" required>
+      </div>
+      <div>
+          <label for="lineid">Line id:</label>
+          <input type="text" id="lineid" name="lineid" required>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+          </div>    
+      <button type="submit">Update Line description</button>
+  </form>
+
+<br>
+
+  <h1>To get a Stop's info:</h1>
+    <form action="/handle_form/" method="post">
+      <input type="hidden" name="func_name" value="get_stop_info">
+      {% csrf_token %}
+      <div>
+        <label for="sch_id">Schedule id:</label>
+        <input type="text" id="sch_id" name="sch_id" required>
+      </div>
+      <div>
+          <label for="stopid">Stop id:</label>
+          <input type="text" id="stopid" name="stopid" required>
+        </div>
+    
+        
+      <button type="submit">Get stop info</button>
+  </form>
+
+<br>
+<h1>To get a Line's info:</h1>
+<form action="/handle_form/" method="post">
+  <input type="hidden" name="func_name" value="get_line_info">
+  {% csrf_token %}
+  <div>
+    <label for="sch_id">Schedule id:</label>
+    <input type="text" id="sch_id" name="sch_id" required>
+  </div>
+  <div>
+      <label for="lineid">Line id:</label>
+      <input type="text" id="lineid" name="lineid" required>
+    </div>
+
+    
+  <button type="submit">Get line info</button>
+</form>
+
+<br>
+
+{% endif %}
+
+{% endblock content %}

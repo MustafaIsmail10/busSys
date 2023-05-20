@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+{% if auth %}
+<h1>To add a Schedule:</h1>
+<form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="add_schedule">
+    {% csrf_token %}
+   
+    <div>
+      <label for="map">Map Id:</label>
+      <input type="text" id="map" name="map" required>
+    </div>
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+    
+    <button type="submit">Add Schedule</button>
+  </form>
+
+  <br>
+
+  <h1>To get current Schedules:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="get_schedules">
+      {% csrf_token %}
+      <button type="submit">Get Schedules</button>
+  </form>
+  <br>
+
+  <h1>To get a specific Schedule:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="get_schedule">
+    {% csrf_token %}
+    <div>
+      <label for="sid">Schedule id:</label>
+      <input type="text" id="sid" name="sid" required>
+    </div>
+    
+    <button type="submit">Get Schedule</button>
+  </form>
+    <br>
+  <h1>To register to a specific Schedule:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="register_to_schedule">
+    {% csrf_token %}
+    <div>
+      <label for="sceduleid">Schedule id:</label>
+      <input type="text" id="scheduleid" name="scheduleid" required>
+    </div>
+    
+    <button type="submit">Register to Schedule</button>
+  </form>
+{% endif %}
+
+{% endblock content %}

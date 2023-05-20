@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+{% if auth %}
+<h1>To add a Map:</h1>
+<form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="add_map">
+    {% csrf_token %}
+   
+    <div>
+      <label for="type">Type of Map:</label>
+      <input type="text" id="type" name="type" required>
+    </div>
+    <div>
+      <label for="mmap">Map:</label>
+      <input type="text" id="mmap" name="mmap" required>
+    </div>
+    
+    <button type="submit">Add Map</button>
+  </form>
+
+  <br>
+
+  <h1>To get current Maps:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="get_maps">
+      {% csrf_token %}
+      <button type="submit">Get Maps</button>
+  </form>
+  <br>
+
+  <h1>To get a specific Map:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="get_map">
+    {% csrf_token %}
+    <div>
+      <label for="mapid">Map id:</label>
+      <input type="text" id="mapid" name="mapid" required>
+    </div>
+    
+    <button type="submit">Get Map</button>
+  </form>
+    <br>
+  <h1>To register to a specific Map:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="register_to_map">
+    {% csrf_token %}
+    <div>
+      <label for="mapid">Map id:</label>
+      <input type="text" id="mapid" name="mapid" required>
+    </div>
+    
+    <button type="submit">Register to Map</button>
+  </form>
+{% endif %}
+
+{% endblock content %}

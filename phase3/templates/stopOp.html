@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+{% if auth %}
+<h1>To add some Bus Stop:</h1>
+<form action="/handle_form/" method="post" >
+  <input type="hidden" name="func_name" value="add_stop">
+    {% csrf_token %}
+    <div>
+      <label for="scheduleid">Schedule id:</label>
+      <input type="text" id="scheduleid" name="scheduleid" required>
+    </div>
+    <div>
+      <label for="edgeID">Edge Id:</label>
+      <input type="text" id="edgeID" name="edgeID" required>
+    </div>
+    <div>
+      <label for="direction">Direction:</label>
+      <input type="text" id="direction" name="direction" required>
+    </div>
+    <div>
+      <label for="percentage">Percentage:</label>
+      <input type="text" id="percentage" name="percentage" required>
+    </div>
+    <div>
+      <label for="description">Description:</label>
+      <input type="text" id="description" name="description" required>
+    </div>
+    <button type="submit">Add</button>
+  </form>
+
+  <br>
+
+  <h1>To get current Bus Stops:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="get_stops">
+      {% csrf_token %}
+      <div>
+        <label for="scheduleid">Schedule id:</label>
+        <input type="text" id="scheduleid" name="scheduleid" required>
+      </div>
+      
+      <button type="submit">Get</button>
+  </form>
+  <br>
+
+  <h1>To delete some Bus Stop:</h1>
+  <form action="/handle_form/" method="post">
+    <input type="hidden" name="func_name" value="del_stop">
+    {% csrf_token %}
+    <div>
+      <label for="scheduleid">Schedule id:</label>
+      <input type="text" id="scheduleid" name="scheduleid" required>
+    </div>
+    <div>
+      <label for="stopid">Stop id:</label>
+      <input type="text" id="stopid" name="stopid" required>
+    </div>
+    <button type="submit">Delete</button>
+  </form>
+
+  {% endif %}
+  
+{% endblock content %}
