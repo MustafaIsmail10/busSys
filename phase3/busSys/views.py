@@ -70,7 +70,7 @@ def login_post(request):
     sock.send('close'.encode())
 
     result = sock.recv(1000).decode().split("\n")
-    while True and result[0]:
+    while result[0]:
         if (len(result)>1 and result[1] == "closed"):
             break
         print(result)
@@ -114,13 +114,14 @@ def handle_form(request):
         response_list.append(result)
         sock.send('close'.encode())
         result = sock.recv(1000).decode().split("\n")
-        response_list.append(result)
-        while(True):
+        print("BUG IN HERE")
+        print(result)
+        while result[0]:
             if (len(result)> 1 and result[1] == "closed"):
                 break
-         
             response_list.append(result)
             result = sock.recv(1000).decode().split("\n")
+        print("BUG IN THERE")
         sock.close()
         context['result_list'] = response_list
     return display_result(request,context)        

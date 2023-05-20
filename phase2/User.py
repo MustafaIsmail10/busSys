@@ -25,6 +25,7 @@ class User:
         self.schedules = []
         self.id = None
 
+
     def is_authenticated(self, token):
         '''
         Checks if this user is authenticated

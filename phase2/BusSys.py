@@ -217,7 +217,9 @@ class BusSys(Singleton):
         """
         sim = Simulator(user, self.schedules[int(sch_id)], int(start_time), int(end_time))
         sim.run()
-        return sim.get_statistics()
+        stt = sim.get_statistics()
+        print("OMG BUG IN HERE")
+        return stt
 
     @reader
     @auth
