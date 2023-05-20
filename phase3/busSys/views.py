@@ -67,12 +67,14 @@ def login_post(request):
     sock.recv(1000)
     sock.send(f'login {username} {password}'.encode())
     token = sock.recv(1000).decode().split("\n")[0]
+    sock.send('close'.encode())
 
-    result = sock.recv(1000).decode().split("\n")[0]
-    print(result)
-    while(result):
-        print(result)
-        result = sock.recv(1000).decode().split("\n")[0]
+    result = sock.recv(1000).decode().split("\n")
+    i = 1
+    while(result[1] != "closed"):
+        print(result, i)
+        result = sock.recv(1000).decode().split("\n")
+        i +=1
         
     sock.send(b'close')
     request.session['token'] = token

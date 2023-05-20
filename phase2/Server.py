@@ -1,7 +1,7 @@
 from socket import *
 import os
 import sys
-from threading import Thread
+from threading import Thread, RLock, Condition
 import Scheduale
 from BusSys import BusSys
 from User import User
@@ -57,6 +57,7 @@ class Server():
         if parsed[0] == "login":
             if len(parsed) < 3:
                 return (None, None)
+            print(parsed)
             user, token = self.busSys.login(parsed[1], parsed[2])
             return (user, token)
         elif parsed[0] == "register":
@@ -96,7 +97,7 @@ class Server():
         print(token)
         return str(result)
 
-    def agent(self, ns):
+    def agent(self, ns, lst):
         '''
         Creates a new user
         This thread divides into two threads:
@@ -112,12 +113,12 @@ class Server():
         ns.send((str(token)+ "\n").encode())
         print(user, token)
         # call auth here
-        task1 = Thread(target=self.user_cmd,  args=(ns, user, token))
-        task2 = Thread(target=self.notif_handler, args=(ns, user, token))
+        task1 = Thread(target=self.user_cmd,  args=(ns, user, token, lst))
+        task2 = Thread(target=self.notif_handler, args=(ns, user, token,lst))
         task1.start()
         task2.start()
 
-    def user_cmd(self, sock, user, token):
+    def user_cmd(self, sock, user, token,lst):
         '''
         Handles user requests and gets response or result
         from the handle_req function and sends it back to user
@@ -127,20 +128,29 @@ class Server():
             parsed = self.parse(req)
             handled_req_response = self.handle_req(parsed, user, token)
             if handled_req_response == None:
-                sock.send("Goodbye".encode())
-                print(sock)
-                sock.close()
-                return 
+                with lst[1]:
+                    lst[0] = False
+                    user.notify("closed")
+                    lst[2].wait()
+                    sock.close()
+                    return 
             sock.send(handled_req_response.encode())
             req = sock.recv(1000)
 
-    def notif_handler(self, sock, user, token):
+    def notif_handler(self, sock, user, token, lst):
         '''
         Sends notifictions whenever there are new updates for this user
         '''
         while True:
             notificatoins = user.get_notifications()
             sock.send(str(notificatoins).encode())
+            with lst[1]:
+                if not lst[0]:
+                    lst[2].notify()
+                    break
+        return 
+
+        
 
     def server(self):
         '''
@@ -238,8 +248,12 @@ class Server():
             while True:
                 ns, peer = self.sock.accept()
                 print(peer, "connected\n")
+                working = True
+                mutex = RLock()
+                wait_notification_close = Condition(mutex)
+                lst = [working, mutex, wait_notification_close]
                 # create a thread with new socket
-                t = Thread(target=self.agent,  args=(ns,))
+                t = Thread(target=self.agent,  args=(ns,lst))
                 t.start()
 
         finally:
