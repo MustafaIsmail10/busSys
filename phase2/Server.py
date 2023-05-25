@@ -54,11 +54,10 @@ class Server():
         req = sock.recv(1000)
 
         parsed = self.parse(req)
-        print(parsed)
+        #print(parsed)
         if parsed[0] == "login":
             if len(parsed) < 3:
                 return (None, None)
-            print(parsed)
             user, token = self.busSys.login(parsed[1], parsed[2])
             #print(user,token)
             return (user, token)
@@ -85,7 +84,6 @@ class Server():
         then sends back the result to
         the user_cmd function
         '''
-        print("in handle req")
         result = None
         try:
             if (req[0] == "close"):
@@ -100,8 +98,8 @@ class Server():
             print("in exception ", result)
             print(e)
             return f"ERROR {str(e)}\n"
-        print("user", user)
-        print(token)
+        # print("user", user)
+        # print(token)
         return str(result)+"\n"
 
     def agent(self, ns, lst):
@@ -112,16 +110,13 @@ class Server():
         the other sends notifications if there are any new updates
         '''
         ns.send("new here? type register , otherwise type login or auToken \n".encode())
-        print("THEEEEE")
         user, token = self.handle_auth(ns)
-        print("in agent",user, token)
+        #print("in agent",user, token)
         if (not user or not token):
             ns.send("Authentication Error\n".encode())
-            print(token, user)
             ns.close()
             return 
         ns.send((str(token)+ "\n").encode())
-        print(user, token)
         # call auth here
         task1 = Thread(target=self.user_cmd,  args=(ns, user, token, lst))
         task2 = Thread(target=self.notif_handler, args=(ns, user, token,lst))
