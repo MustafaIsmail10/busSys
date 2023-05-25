@@ -54,6 +54,7 @@ class Server():
         req = sock.recv(1000)
 
         parsed = self.parse(req)
+        #print(parsed)
         if parsed[0] == "login":
             if len(parsed) < 3:
                 return (None, None)
@@ -96,6 +97,8 @@ class Server():
         except Exception as e:
             print(e)
             return f"ERROR {str(e)}\n"
+        # print("user", user)
+        # print(token)
         return str(result)+"\n"
 
     def agent(self, ns, lst):
@@ -107,6 +110,7 @@ class Server():
         '''
         ns.send("new here? type register , otherwise type login or auToken \n".encode())
         user, token = self.handle_auth(ns)
+        #print("in agent",user, token)
         if (not user or not token):
             ns.send("Authentication Error\n".encode())
             ns.close()

@@ -6,6 +6,43 @@ BusSys is a collaborative bus route designer
 
 2455566: Hana Elboghdady
 
+# Running phase 3
+First to run the busSys server itself, go to the first part of [Running phase 2](#running-phase-2) section 
+
+Then to start the web server:
+
+Change directory to phase 3 `cd phase3` 
+
+Enter the following command to start the django server `python3 manage.py runserver`
+
+A window will be opened and the Home-page will be displayed where several functionalities can be accessed.
+
+Login must be done first to authorize access to the rest of the functionalities.
+
+
+# Implementaion Phase 3
+
+## Server Class
+
+Some changes to the Server in phase 2 to incorprate a communication protocol between both web and busSys servers.
+
+## busSys Directory
+
+Contains views and urls. 
+
+Views is where the server connects to busSys server and handles authorization, the user requests sent through the forms
+and displaying results from busSys server.
+
+Urls is where the linking of html and view functions happens.
+
+## templates Directory 
+
+Contains all the HTML pages that are displayed to users. 
+
+## requirements.txt 
+
+File listing all the dependencies for the project.
+
 # Running phase 2
 
 Change directory to phase 2 `cd phase2` 

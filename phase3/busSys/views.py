@@ -90,7 +90,7 @@ def handle_form(request):
         for key, value in request.POST.items():
             if key=="csrfmiddlewaretoken": 
                 continue
-            toserver+= f' {value}'  ,
+            toserver+= f' {value}'  
         # The following is a holy piece of code. 
         # It establishes a connection with the bussys server for getting the required functionalities
         # It gets the response from the server and sends it to the display function for formatting
