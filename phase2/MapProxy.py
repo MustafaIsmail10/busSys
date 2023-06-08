@@ -46,7 +46,7 @@ class MapProxy():
         def notification(self, *args, **kwargs):
                 res = func(self, *args, **kwargs)
                 for user in self.users:
-                    user.notify(res)
+                    user.notify(f"Map {self._map.map_id} has a Modification: " + str(res))
                 return res
         return notification
 
@@ -70,11 +70,12 @@ class MapProxy():
 
     @synched
     @notify
-    def register(self, user):
+    def register(self, user:User):
         '''
         This function registers users to the map
         '''
         self.users.append(user)
+        return f"User with id {user.get_id()} is registered to the map with id {self._map.map_id}"
 
     @synched
     @notify
@@ -83,6 +84,7 @@ class MapProxy():
         This function unregisters user from map
         '''
         self.users.remove(user)
+        return f"User with id {user.get_id()} is unregistered from the map with id {self._map.map_id}"
 
     @synched
     def shortest(self, node1, node2):

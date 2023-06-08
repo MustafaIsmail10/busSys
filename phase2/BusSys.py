@@ -164,7 +164,7 @@ class BusSys(Singleton):
         """
         result = ""
         for mapid in self.maps:
-            result += f"{str(self.maps[mapid])}\n\n "
+            result += f"{str(self.maps[mapid])}\n"
         return result
 
     @reader
