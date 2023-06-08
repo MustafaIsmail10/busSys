@@ -48,7 +48,7 @@ class ScheduleProxy():
         def notification(self, *args, **kwargs):
                 res = func(self, *args, **kwargs)
                 for user in self.users:
-                    user.notify(res)
+                    user.notify(f"Shedule {self.sch_id} notification :" + str(res))
                 return res
         return notification
 
