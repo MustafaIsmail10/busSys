@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if auth %}
+    {% for value in result_list %}
+    <p>{{ value }}</p>
+    {% endfor %}
+    
+{% endif %}
+
+{% endblock content %}

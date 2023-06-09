@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if auth %}
+        
+    <center>
+    <h2> Pick an action! </h2>
+    <button onclick="window.location.href='/design/route/'"  style="display: block; width: 200px; height: 50px;">Click here for Route operations</button>
+    <br>
+    <button onclick="window.location.href='/design/StopOp/'" style="display: block; width: 200px; height: 50px;">Click here for Bus operations </button>
+    <br>
+    <button onclick="window.location.href='/design/schedule/'" style="display: block; width: 200px; height: 50px;">Click here for Schedule operations</button>
+    <br>
+    <button onclick="window.location.href='/design/map/'" style="display: block; width: 200px; height: 50px;">Click here for Map operations</button>
+    <br>
+    <button onclick="window.location.href='/design/line'" style="display: block; width: 200px; height: 50px;">Click here for Line operations</button>
+    <br>
+    <button onclick="window.location.href='/simulate'" style="display: block; width: 200px; height: 50px;">Click here for a Simulation run</button>
+    <br>
+    </center>
+
+{% endif %}
+
+{% endblock content %}

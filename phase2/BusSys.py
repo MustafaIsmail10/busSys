@@ -100,11 +100,13 @@ class BusSys(Singleton):
         """
         This function is used to login a user with uesr_name and passwd
         """
-        for user in self.users:
-            if username == self.users[user].get_username():
-                token =  self.users[user].login(passwd)
-                return (self.users[user], token)
-
+        try:
+            for user in self.users:
+                if username == self.users[user].get_username():
+                    token =  self.users[user].login(passwd)
+                    return (self.users[user], token)
+        except Exception as e:
+            print(e)
         return (None, None)
     
 

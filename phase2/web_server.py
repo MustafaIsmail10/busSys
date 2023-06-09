@@ -179,11 +179,13 @@ class Server:
         """
         while True:
             notificatoins = user.get_notifications()
+            
             with lst[1]:
                 if not lst[0]:
                     print("Notification Thread is dead")
                     return
-            connection.send(json.dumps(notificatoins))
+            if (notificatoins):
+                connection.send(json.dumps(notificatoins))
 
     def connection_handler(self, connection):
         user, token = self.handle_auth(connection)
@@ -213,11 +215,13 @@ class Server:
             except websockets.exceptions.ConnectionClosed:
                 print("Connection is terminated")
 
-            connection.close()
             # Killing notification thread
             with mutex:
                 lst[0] = False
                 user.notify("close")
+            
+            connection.close()
+
 
         else:
             print("Authentication Error")
