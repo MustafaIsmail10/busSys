@@ -89,6 +89,9 @@ class BusSys(Singleton):
     
     @writer
     def register(self, username, passwd):
+        names = [self.users[user].get_username() for user in self.users]
+        if (username in names):
+            return (None, None)
         user = User()
         token = user.register(username, passwd)
         self.add_user(user)

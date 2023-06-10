@@ -11,13 +11,14 @@ function connectWebSocket() {
         let msg = JSON.parse(event.data)
 
         if (msg.type == "error") {
-            document.getElementById("error_msg").innerText = "Server Error"
+            document.getElementById("error_msg").innerText = "Try different username"
         } else if (msg.type == "token") {
             console.log(msg.token)
             // Store the token insided the browser and redirect to home page
             localStorage.setItem("token", msg.token);
             window.open("http://localhost:8000", "_self");
-
+            document.getElementById("error_msg").innerText = ""
+        
         } else if (msg.type == "notification") {
 
         } else {
