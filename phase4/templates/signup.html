@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2 id="h2">Login</h2>
+<h2>Sign Up</h2>
 <form method="post">
   {% csrf_token %}
   <div>
@@ -12,10 +12,9 @@
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
   </div>
-  <button type="submit">Login</button>
+  <button type="submit">Signup</button>
 </form>
 <p id="error_msg"></p>
-<div id="notifications"></div>
 {% load static %}
-<script src="{% static 'js/login.js' %}"></script>
+<script src="{% static 'js/signup.js' %}"></script>
 {% endblock %}

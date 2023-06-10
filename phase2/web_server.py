@@ -192,7 +192,12 @@ class Server:
         print(user, token)
         if user:
             print("Authentication Valid")
-            connection.send(token)
+            response = {
+                "type": "token",
+                "token": token,
+                "username": user.get_username(),
+            }
+            connection.send(json.dumps(response))
             working = True
             mutex = RLock()
             lst = [working, mutex]
@@ -225,7 +230,11 @@ class Server:
 
         else:
             print("Authentication Error")
-            connection.send("Auth Error")
+            response = {
+                "type": "error",
+                "msg": "Authentication Error"
+            }
+            connection.send(json.dumps(response))
             connection.close()
 
 

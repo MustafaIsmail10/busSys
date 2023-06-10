@@ -116,7 +116,7 @@ class User:
             response = {"type":"notification", 
                         "status": True,
                         "status_str":None,
-                        "notifications": new_messages}
+                        "result": new_messages}
             return response
 
     def notify(self, msg):

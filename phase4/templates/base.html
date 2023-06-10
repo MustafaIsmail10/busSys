@@ -30,7 +30,7 @@
             /* Adjust the background color of the footer */
         }
     </style>
-
+    <link rel="shortcut icon" href="#">
     <link href="{% static 'css/base.css' %}" rel="stylesheet">
 </head>
 
@@ -44,8 +44,8 @@
         <a href="{% url 'signout' %}">Sign out</a> |
         <p style="display: inline;">{{ username }}</p>
         {% else %}
-        <a href="{% url 'login' %}">Log In</a> |
-        <a href="{% url 'signup' %}">Sign up</a> |
+        <a class = "not_logged" href="{% url 'login' %}">Log In</a> |
+        <a class = "not_logged" href="{% url 'signup' %}">Sign up</a> |
         {% endif %}
     </header>
 

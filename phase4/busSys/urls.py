@@ -1,13 +1,13 @@
 from django.urls import path
-from .views import home, login,signout, simulate,design,stopOp,schedule,line,Map,route,handle_form,display_result
+from .views import home, login,signout, simulate,design,stopOp,schedule,line,Map,route,handle_form,display_result, signup
 
 
 urlpatterns = [
     path("", home, name="home"),
     path('login/', login, name='login'),
-    path("signup", login, name="signup"),
-    path("simulate", simulate, name="simulate"),
-    path("signout", signout, name="signout"),
+    path("signup/", signup, name="signup"),
+    path("simulate/", simulate, name="simulate"),
+    path("signout/", signout, name="signout"),
     path("design/", design, name="design"),
     path("design/StopOp/", stopOp, name="StopOp"),
     path("design/route/", route, name="route"),

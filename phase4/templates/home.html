@@ -6,7 +6,8 @@
 {% if auth %}
 Welcome <h2>Hi {{ username }}!</h2> to the bussys
 {% else %}
-<h2>Welcome to the best bus system in the world</h2> 
+<h2>Welcome to the best bus system in the world</h2>
 {% endif %}
-
+{% load static %}
+<script src="{% static 'js/home.js' %}"></script>
 {% endblock content %}
