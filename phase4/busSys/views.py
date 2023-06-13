@@ -11,24 +11,15 @@ def home(request):
     """
     Handling main page requests
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-    return render(request, "home.html", context)
+    return render(request, "home.html")
 
 
 def simulate(request):
     """
     Handling simualtion page requests
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-    return render(request, "simulation.html", context)
+    
+    return render(request, "simulation.html")
 
 
 def login(request):
@@ -53,30 +44,6 @@ def signup(request):
     return render(request, "signup.html", context)
 
 
-def login_post(request):
-    """
-    Handling login form requests
-    """
-    login_data = request.POST
-    username = login_data["username"]
-    password = login_data["password"]
-    sock = socket(AF_INET, SOCK_STREAM)
-    sock.connect(("127.0.0.1", 1445))
-    sock.recv(1000)
-    sock.send(f"login {username} {password}".encode())
-    token = sock.recv(1000).decode().split("\n")[0]
-    sock.send("close".encode())
-
-    result = sock.recv(1000).decode().split("\n")
-    while result[0]:
-        if len(result) > 1 and result[1] == "closed":
-            break
-        result = sock.recv(1000).decode().split("\n")
-
-    sock.close()
-    request.session["token"] = token
-    request.session["username"] = login_data["username"]
-    return redirect("home")
 
 
 def signout(request):
@@ -88,141 +55,55 @@ def signout(request):
     return redirect("home")
 
 
-def handle_form(request):
-    """
-    Handling form requests for all functionalities. Getting the requests from the web page and sending them to bussys server
-    """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-    if request.method == "POST":
-        toserver = ""
-        for key, value in request.POST.items():
-            if key == "csrfmiddlewaretoken":
-                continue
-            toserver += f" {value}"
-        # The following is a holy piece of code.
-        # It establishes a connection with the bussys server for getting the required functionalities
-        # It gets the response from the server and sends it to the display function for formatting
-        sock = socket(AF_INET, SOCK_STREAM)
-        sock.connect(("127.0.0.1", 1445))
-        sock.recv(1000)
-        sock.send(f"auToken {token}".encode())
-        auth = sock.recv(1000).decode().split("\n")[0]
-        sock.send(toserver.encode())
-        response_list = []
-        result = sock.recv(1000).decode().split("\n")
-        response_list.append(result)
-        sock.send("close".encode())
-        result = sock.recv(1000).decode().split("\n")
-        while result[0]:
-            if len(result) > 1 and result[1] == "closed":
-                break
-            response_list.append(result)
-            result = sock.recv(1000).decode().split("\n")
-        sock.close()
-        context["result_list"] = response_list
-    return display_result(request, context)
-
-
-def display_result(request, context):
-    """
-    Handling diplay of the results for all functionalities
-    """
-    result_str = ""
-    for lst in context["result_list"]:
-        for elem in lst:
-            result_str += elem
-    result_str = result_str.replace("New Message", "\nNew Message: ")
-    result_str = result_str.replace(" The", "$")
-    result_str = result_str.replace("The", "\nThe")
-    result_str = result_str.replace("$", " The")
-    result_str = sub(r"},", "}\n ", result_str)
-    result_str = result_str.replace("A", "\nA").split("\n")
-    # indices = [index for index in range(len(result_str)) if result_str.startswith('New', index)]
-    # print(indices)
-    # indices= indices.reverse()
-    # for i in indices:
-
-    context["result_list"] = result_str
-    return render(request, "result.html", context)
+def display_result(request):
+    
+    return render(request, "result.html")
 
 
 def design(request):
     """
     Handling requests for design page
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
+    
 
-    return render(request, "design.html", context)
+    return render(request, "design.html")
 
 
 def stopOp(request):
     """
     Handling stop page
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-
-    return render(request, "stopOp.html", context)
+  
+    return render(request, "stopOp.html")
 
 
 def route(request):
     """
     Handling route page
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-
-    return render(request, "route.html", context)
+    
+    return render(request, "route.html")
 
 
 def schedule(request):
     """
     Handling schedule page
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-
-    return render(request, "schedule.html", context)
+   
+    return render(request, "schedule.html")
 
 
-def Map(request):
+def map(request):
     """
     Handling map page
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-
-    return render(request, "map.html", context)
+  
+    return render(request, "map.html")
 
 
 def line(request):
     """
     Handling line page
     """
-    token = request.session.get("token")
-    context = {}
-    if token:
-        context["auth"] = True
-        context["username"] = request.session.get("username")
-
-    return render(request, "line.html", context)
+    
+    return render(request, "line.html")

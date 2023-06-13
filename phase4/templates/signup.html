@@ -1,19 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% load static %}
+<link href="{% static 'css/login-signup.css' %}" rel="stylesheet">
+<div class="l">
 <h2>Sign Up</h2>
 <form method="post">
   {% csrf_token %}
   <div>
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+    <input class="input-field" type="text" id="username" name="username" required>
   </div>
   <div>
     <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
+    <input class="input-field" type="password" id="password" name="password" required>
   </div>
-  <button type="submit">Signup</button>
+  <button class="submit-button" type="submit">Signup</button>
 </form>
+</div>
 <p id="error_msg"></p>
 {% load static %}
 <script src="{% static 'js/signup.js' %}"></script>

@@ -1,20 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-{% if auth %}
-<h1>To add a Schedule:</h1>
-<form action="/handle_form/" method="post">
+{% load static %}
+<link href="{% static 'css/notifs.css' %}" rel="stylesheet">
+<div id="page" style='display: none'>
+  <div id="notification-box">
+    <div id="notification-message">This is a notification message.</div>
+  </div>
+  <h1>Schedule Operations</h1>
+<h2>To add a Schedule:</h2>
+<form method="post">
     <input type="hidden" name="func_name" value="add_schedule">
     {% csrf_token %}
    
     <div>
       <label for="map">Map Id:</label>
-      <input type="text" id="map" name="map" required>
+      <input class="input-field" type="text" id="map" name="map" required>
     </div>
     <div>
       <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required>
+      <input class="input-field" type="text" id="name" name="name" required>
     </div>
     
     <button type="submit">Add Schedule</button>
@@ -22,37 +27,38 @@
 
   <br>
 
-  <h1>To get current Schedules:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>To get current Schedules:</h2>
+  <form method="post">
     <input type="hidden" name="func_name" value="get_schedules">
       {% csrf_token %}
       <button type="submit">Get Schedules</button>
   </form>
   <br>
 
-  <h1>To get a specific Schedule:</h1>
+  <h2>To get a specific Schedule:</h2>
   <form action="/handle_form/" method="post">
     <input type="hidden" name="func_name" value="get_schedule">
     {% csrf_token %}
     <div>
       <label for="sid">Schedule id:</label>
-      <input type="text" id="sid" name="sid" required>
+      <input class="input-field" type="text" id="sid" name="sid" required>
     </div>
     
     <button type="submit">Get Schedule</button>
   </form>
     <br>
-  <h1>To register to a specific Schedule:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>To register to a specific Schedule:</h2>
+  <form  method="post">
     <input type="hidden" name="func_name" value="register_to_schedule">
     {% csrf_token %}
     <div>
       <label for="sceduleid">Schedule id:</label>
-      <input type="text" id="scheduleid" name="scheduleid" required>
+      <input class="input-field" type="text" id="scheduleid" name="scheduleid" required>
     </div>
     
     <button type="submit">Register to Schedule</button>
   </form>
-{% endif %}
-
+</div>
+{% load static %}
+<script src="{% static 'js/formhandle.js' %}"></script>
 {% endblock content %}

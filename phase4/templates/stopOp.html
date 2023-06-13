@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-
-{% if auth %}
-<h1>To add some Bus Stop:</h1>
-<form action="/handle_form/" method="post" >
+{% load static %}
+<link href="{% static 'css/notifs.css' %}" rel="stylesheet">
+<div id="page" style='display: none'>
+  <div id="notification-box">
+    <div id="notification-message">This is a notification message.</div>
+  </div>
+  <h1>Stop Operations</h1>
+<h2>To add some Bus Stop:</h2>
+<form method="post" >
   <input type="hidden" name="func_name" value="add_stop">
     {% csrf_token %}
     <div>
@@ -33,8 +37,8 @@
 
   <br>
 
-  <h1>To get current Bus Stops:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>To get current Bus Stops:</h2>
+  <form method="post">
     <input type="hidden" name="func_name" value="get_stops">
       {% csrf_token %}
       <div>
@@ -46,8 +50,8 @@
   </form>
   <br>
 
-  <h1>To delete some Bus Stop:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>To delete some Bus Stop:</h2>
+  <form method="post">
     <input type="hidden" name="func_name" value="del_stop">
     {% csrf_token %}
     <div>
@@ -60,7 +64,7 @@
     </div>
     <button type="submit">Delete</button>
   </form>
-
-  {% endif %}
-  
+</div>
+{% load static %}
+<script src="{% static 'js/formhandle.js' %}"></script>
 {% endblock content %}

@@ -2,13 +2,16 @@
 {% block content %}
 
 
-
-{% if auth %}
-
+{% load static %}
+<link href="{% static 'css/notifs.css' %}" rel="stylesheet">
+<div id="page" style='display: none'>
+  <div id="notification-box">
+    <div id="notification-message">This is a notification message.</div>
+  </div>
 <center>
     <h1>Welcome To The Simulation of busSys!</h1>
    <h3>This simulation might take up to 10 mins to finish </h3>
-    <form method="post" action="/handle_form/">
+    <form method="post">
         <input type="hidden" name="func_name" value="simulate">
         {% csrf_token %}
         <div>
@@ -32,8 +35,8 @@
 
 
 
-{% else %}
-<h2>You need to login</h2>
-{% endif %}
+</div>
+{% load static %}
+<script src="{% static 'js/formhandle.js' %}"></script>
 
 {% endblock content %}

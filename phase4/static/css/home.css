@@ -1,0 +1,13 @@
+body {
+    background-image: url("/static/img/bg1.png");
+    background-repeat: no-repeat;
+    background-size: 40%;
+    background-position: 90% 90%;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }

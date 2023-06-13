@@ -1,121 +1,120 @@
 {% extends "base.html" %}
 {% block content %}
+{% load static %}
+<link href="{% static 'css/notifs.css' %}" rel="stylesheet">
 
 
-{% if auth %}
-<h1>To add a Route:</h1>
+<div id="page" style='display: none'>
+  
+  <div id="notification-box">
+    <div id="notification-message">This is a notification message.</div>
+  </div>
+  <h1>Route Operations</h1>
+<h2>Add a Route:</h2>
 
-<form action="/handle_form/" method="post">
+<form method="post" >
     <input type="hidden" name="func_name" value="add_route">
     {% csrf_token %}
-    <div>
+    
       <label for="scheduleid">Schedule id:</label>
-      <input type="text" id="sceduleid" name="sceduleid" required>
-    </div>
+      <input class="input-field" type="text" id="sceduleid" name="sceduleid" required>
+    
     
     <button type="submit">Add a new Route</button>
   </form>
 
   <br>
 
-  <h1>To get current Routes for a Schedule:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>Get current Routes for a Schedule:</h2>
+  <form  method="post">
     <input type="hidden" name="func_name" value="get_routes">
       {% csrf_token %}
-      <div>
+      
         <label for="sid">Schedule id:</label>
-        <input type="text" id="sid" name="sid" required>
-      </div>
+        <input class="input-field" type="text" id="sid" name="sid" required>
+      
       <button type="submit">Get Routes of Schedule </button>
   </form>
   <br>
 
-  <h1>To get a specific Route in a Schedule:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>Get a specific Route in a Schedule:</h2>
+  <form  method="post">
     <input type="hidden" name="func_name" value="get_route">
     {% csrf_token %}
-    <div>
+    
         <label for="sid">Schedule id:</label>
-        <input type="text" id="sid" name="sid" required>
-      </div>
-    <div>
+        <input class="input-field" type="text" id="sid" name="sid" required>
+    
       <label for="rid">Route id:</label>
-      <input type="text" id="rid" name="rid" required>
-    </div>
+      <input class="input-field" type="text" id="rid" name="rid" required>
+ 
     
     <button type="submit">Get Route</button>
   </form>
     <br>
-  <h1>To add an existing Stop to a specific Route:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>Add an existing Stop to a specific Route:</h2>
+  <form method="post">
     <input type="hidden" name="func_name" value="add_stop_to_route">
     {% csrf_token %}
-    <div>
+  
       <label for="sch_id">Schedule id:</label>
-      <input type="text" id="sch_id" name="sch_id" required>
-    </div>
-    <div>
+      <input class="input-field" type="text" id="sch_id" name="sch_id" required>
+   
         <label for="routeid">Route id:</label>
-        <input type="text" id="routeid" name="routeid" required>
-      </div>
-    <div>
+        <input class="input-field" type="text" id="routeid" name="routeid" required>
+   
         <label for="stop_id">Stop id:</label>
-        <input type="text" id="stop_id" name="stop_id" required>
-    </div>
-    <div>
+        <input class="input-field" type="text" id="stop_id" name="stop_id" required>
+    
         <label for="wait_time">Wait time:</label>
-        <input type="text" id="wait_time" name="wait_time" required>
-    </div>
+        <input class="input-field" type="text" id="wait_time" name="wait_time" required>
+   
       
     <button type="submit">Add Stop</button>
-    
+  </form>
     <br>
-    <h1>To remove a Stop from a specific Route:</h1>
+    <h2>Remove a Stop from a specific Route:</h2>
     
-    <form action="/handle_form/" method="post">
+    <form method="post">
       <input type="hidden" name="func_name" value="del_stop_from_route">
       {% csrf_token %}
-      <div>
+     
         <label for="sch_id">Schedule id:</label>
-        <input type="text" id="sch_id" name="sch_id" required>
-      </div>
-      <div>
+        <input class="input-field" type="text" id="sch_id" name="sch_id" required>
+     
           <label for="routeid">Route id:</label>
-          <input type="text" id="routeid" name="routeid" required>
-        </div>
-      <div>
+          <input class="input-field" type="text" id="routeid" name="routeid" required>
+       
           <label for="stop_id">Stop id:</label>
-          <input type="text" id="stop_id" name="stop_id" required>
-      </div>
-        
+          <input class="input-field" type="text" id="stop_id" name="stop_id" required>
+  
       <button type="submit">Delete Stop</button>
   </form>
 
   <br>
-  <h1>To change Stop wait time in a specific Route:</h1>
-  <form action="/handle_form/" method="post">
+  <h2>Change Stop wait time in a specific Route:</h2>
+  <form  method="post">
     <input type="hidden" name="func_name" value="change_stop_wait">
     {% csrf_token %}
-    <div>
+   
       <label for="sch_id">Schedule id:</label>
-      <input type="text" id="sch_id" name="sch_id" required>
-    </div>
-    <div>
+      <input class="input-field" type="text" id="sch_id" name="sch_id" required>
+   
         <label for="routeid">Route id:</label>
-        <input type="text" id="routeid" name="routeid" required>
-      </div>
-    <div>
-        <label for="stop_id">Stop id:</label>
-        <input type="text" id="stop_id" name="stop_id" required>
-    </div>
-    <div>
-        <label for="wait_time">Wait time:</label>
-        <input type="text" id="wait_time" name="wait_time" required>
-    </div>
+        <input class="input-field" type="text" id="routeid" name="routeid" required>
       
+        <label for="stop_id">Stop id:</label>
+        <input class="input-field" type="text" id="stop_id" name="stop_id" required>
+   
+        <label for="wait_time">Wait time:</label>
+        <input class="input-field" type="text" id="wait_time" name="wait_time" required>
+    
     <button type="submit">Change wait time</button>
     
     <br>
-{% endif %}
+  </div>
+  
+{% load static %}
+<script src="{% static 'js/formhandle.js' %}"></script>
 
 {% endblock content %}

@@ -1,32 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
+{% load static %}
+<link href="{% static 'css/notifs.css' %}" rel="stylesheet">
+<div id="page" style='display: none'>
+  <div id="notification-box">
+    <div id="notification-message">This is a notification message.</div>
+  </div>
+  <h1>Line Operations</h1>
+<h2>To add a Line:</h2>
 
-{% if auth %}
-<h1>To add a Line:</h1>
-
-<form action="/handle_form/" method="post">
+<form method="post">
 
     <input type="hidden" name="func_name" value="add_line">
     {% csrf_token %}
     <div>
       <label for="scheduleid">Schedule id:</label>
-      <input type="text" id="sceduleid" name="sceduleid" required>
+      <input class="input-field" type="text" id="sceduleid" name="sceduleid" required>
     </div>
     <div>
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
+        <input class="input-field" type="text" id="name" name="name" required>
       </div>
     <div>
     <label for="start">Start time:</label>
-    <input type="text" id="start" name="start" required>
+    <input class="input-field" type="text" id="start" name="start" required>
     </div>
     <div>
         <label for="end">End time:</label>
-        <input type="text" id="end" name="end" required>
+        <input class="input-field" type="text" id="end" name="end" required>
       </div>
     <div>
         <label for="time">Time between trips:</label>
-        <input type="text" id="time" name="time" required>
+        <input class="input-field" type="text" id="time" name="time" required>
       </div>
     <div>
         <label for="routeid">Route id:</label>
@@ -34,7 +39,7 @@
       </div>
     <div>
         <label for="description">Description:</label>
-        <input type="text" id="description" name="description" required>
+        <input class="input-field" type="text" id="description" name="description" required>
       </div>
     
     <button type="submit">Add a new Line</button>
@@ -42,13 +47,13 @@
 
   <br>
 
-  <h1>To print all Lines :</h1>
-  <form action="/handle_form/" method="post">
+  <h2>To print all Lines :</h2>
+  <form  method="post">
     <input type="hidden" name="func_name" value="get_lines">
       {% csrf_token %}
       <div>
         <label for="sid">Schedule id:</label>
-        <input type="text" id="sid" name="sid" required>
+        <input class="input-field" type="text" id="sid" name="sid" required>
       </div>
       <button type="submit">Get Lines of Schedule </button>
   </form>
@@ -57,17 +62,17 @@
     
     <br>
 
-    <h1>To remove a Line:</h1>
-    <form action="/handle_form/" method="post">
+    <h2>To remove a Line:</h2>
+    <form  method="post">
       <input type="hidden" name="func_name" value="del_line">
       {% csrf_token %}
       <div>
         <label for="sch_id">Schedule id:</label>
-        <input type="text" id="sch_id" name="sch_id" required>
+        <input class="input-field" type="text" id="sch_id" name="sch_id" required>
       </div>
       <div>
           <label for="lineid">Line id:</label>
-          <input type="text" id="lineid" name="lineid" required>
+          <input class="input-field" type="text" id="lineid" name="lineid" required>
         </div>
     
         
@@ -75,8 +80,8 @@
   </form>
 
   <br>
-  <h1>To Update a Line's name:</h1>
-    <form action="/handle_form/" method="post">
+  <h2>To Update a Line's name:</h2>
+    <form method="post">
       <input type="hidden" name="func_name" value="update_line_name">
       {% csrf_token %}
       <div>
@@ -95,8 +100,8 @@
   </form>
 
   <br>
-  <h1>To Update a Line's start time:</h1>
-    <form action="/handle_form/" method="post">
+  <h2>To Update a Line's start time:</h2>
+    <form method="post">
       <input type="hidden" name="func_name" value="update_line_start_time">
       {% csrf_token %}
       <div>
@@ -116,8 +121,8 @@
   </form>
 
   <br>
-  <h1>To Update a Line's end time:</h1>
-    <form action="/handle_form/" method="post">
+  <h2>To Update a Line's end time:</h2>
+    <form method="post">
       <input type="hidden" name="func_name" value="update_line_end_time">
       {% csrf_token %}
       <div>
@@ -137,8 +142,8 @@
   </form>
   <br>
   
-  <h1>To Update a Line's time between trips:</h1>
-    <form action="/handle_form/" method="post">
+  <h2>To Update a Line's time between trips:</h2>
+    <form method="post">
       <input type="hidden" name="func_name" value="update_line_time_between_trips">
       {% csrf_token %}
       <div>
@@ -157,8 +162,8 @@
       <button type="submit">Update Line time</button>
   </form>
 <br>
-<h1>To Update a Line's description:</h1>
-    <form action="/handle_form/" method="post">
+<h2>To Update a Line's description:</h2>
+    <form method="post">
       <input type="hidden" name="func_name" value="update_line_description">
       {% csrf_token %}
       <div>
@@ -178,7 +183,7 @@
 
 <br>
 
-  <h1>To get a Stop's info:</h1>
+  <h2>To get a Stop's info:</h2>
     <form action="/handle_form/" method="post">
       <input type="hidden" name="func_name" value="get_stop_info">
       {% csrf_token %}
@@ -196,8 +201,8 @@
   </form>
 
 <br>
-<h1>To get a Line's info:</h1>
-<form action="/handle_form/" method="post">
+<h2>To get a Line's info:</h2>
+<form method="post">
   <input type="hidden" name="func_name" value="get_line_info">
   {% csrf_token %}
   <div>
@@ -214,7 +219,7 @@
 </form>
 
 <br>
-
-{% endif %}
-
+</div>
+{% load static %}
+<script src="{% static 'js/formhandle.js' %}"></script>
 {% endblock content %}

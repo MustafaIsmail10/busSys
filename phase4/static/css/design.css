@@ -1,0 +1,33 @@
+.buttons{
+    position: relative;
+    width: 400px;
+    height: 57px;
+    margin-top: 20px;
+    margin-right: 20%;
+    margin-left: 35%;
+    background: #026560;
+    color: white;
+    border-radius: 50px;
+    display: inline-block;
+   
+}
+.buttons:hover{
+    background: white;
+    color: #026560;
+}
+
+.heading{
+    position: relative;
+    text-align: right;
+    height: 15%;
+    left: 15%;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 40px;
+    line-height: 50px;
+    margin: 0;
+    color: #054F50;
+}
+#options{
+    margin-bottom: 10 ;
+}

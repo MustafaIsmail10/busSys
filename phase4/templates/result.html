@@ -1,11 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-
-{% if auth %}
-    {% for value in result_list %}
-    <p>{{ value }}</p>
-    {% endfor %}
-    
-{% endif %}
-
+<div id="page">
+<h2>Result:</h2>
+<div id="res"></div>
+</div>
+{% load static %}
+<script src="{% static 'js/result.js' %}"></script>
 {% endblock content %}

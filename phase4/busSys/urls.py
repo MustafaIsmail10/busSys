@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, login,signout, simulate,design,stopOp,schedule,line,Map,route,handle_form,display_result, signup
+from .views import home, login,signout, simulate,design,stopOp,schedule,line,map,route,display_result, signup
 
 
 urlpatterns = [
@@ -12,8 +12,8 @@ urlpatterns = [
     path("design/StopOp/", stopOp, name="StopOp"),
     path("design/route/", route, name="route"),
     path("design/schedule/", schedule, name="schedule"),
-    path("design/map/", Map, name="map"),
+    path("design/map/", map, name="map"),
     path("design/line/", line, name="line"),
-    path('handle_form/', handle_form, name='handle_form'),
-    path("result/",display_result,name="result")
+    path("result/",display_result,name="result"),
+    
 ]

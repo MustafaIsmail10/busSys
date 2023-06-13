@@ -1,13 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% load static %}
+<link href="{% static 'css/home.css' %}" rel="stylesheet">
 
 
-{% if auth %}
-Welcome <h2>Hi {{ username }}!</h2> to the bussys
-{% else %}
-<h2>Welcome to the best bus system in the world</h2>
-{% endif %}
+<h1 class="heading">Welcome to our Bus Routing System!</h1>
+<div class="intro">
+<p>
+
+    Our platform offers a collaborative environment for managing bus routes and schedules. Once logged in, users have the ability to edit and view route information, ensuring an up-to-date and efficient transit system.</p>
+ 
+<p>In addition, users can actively contribute to the bus routing system. If you notice a new stop that should be added, or if a stop needs to be removed or relocated, you have the power to make those changes. This collaborative approach ensures that our bus routes are always accurate and reflective of the community's needs.</p>
+    
+<p>  Click design and experience the power of collaboration in our Bus Routing System.</p>
+</div>
+
 {% load static %}
 <script src="{% static 'js/home.js' %}"></script>
+
 {% endblock content %}

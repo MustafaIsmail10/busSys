@@ -19,6 +19,7 @@ class Server:
         """
         This method parses the new request
         """
+        req = req.strip()
         return req.split(" ")
 
     def initialize_server(self):

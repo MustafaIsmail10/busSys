@@ -21,6 +21,8 @@ function connectWebSocket() {
             document.getElementById("h2").innerText = "Notifications"
             var els = document.getElementsByClassName("not_logged");
             els[0].innerHTML = msg.username;
+            els[0].href ="";
+            els[0].style.pointerEvents = "none";
             els[0].removeAttribute("href");
             els[1].href = ""
             els[1].innerHTML = "signout";
