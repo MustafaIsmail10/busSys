@@ -43,6 +43,7 @@ function connectWebSocket() {
            
         } else if (msg.type == "notification") {
             console.log("result " ,msg);
+            showNotification(msg.result);
         } else {
             console.log("result received " ,msg.result);
             showNotification(msg.result);

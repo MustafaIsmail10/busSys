@@ -6,6 +6,39 @@ BusSys is a collaborative bus route designer
 
 2455566: Hana Elboghdady
 
+
+# Running phase 4
+**To run the busSys server itself do the following** 
+
+- Change directory to phase 2 `cd phase2` 
+
+- Enter the following command to run the server `python3 web_server.py --port 1445`
+
+**To run Djnago server do the following**
+
+- Change directory to phase 4 `cd phase4` 
+
+- Enter the following command to start the django server `python3 manage.py runserver`
+
+
+# Implementaion Phase 4
+
+## Web_server 
+
+The interface of bussys server is changed from a normal tcp server to a server using web sockets
+
+## DJango
+
+Django is used to only serve static files of the system such as JS, HTML, and CSS files
+
+## Javascript
+
+There are several front end scripts used to authenticate user and communicate with bussys server through a websocket interface.
+
+## requirements.txt 
+
+File listing all the dependencies for the project.
+
 # Running phase 3
 First to run the busSys server itself, go to the first part of [Running phase 2](#running-phase-2) section 
 

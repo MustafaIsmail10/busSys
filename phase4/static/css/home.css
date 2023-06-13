@@ -11,3 +11,20 @@ html, body {
     padding: 0;
     overflow: hidden;
   }
+
+  #notification-box {
+    position: fixed;
+    top: 80%;
+    left: 80%;
+    transform: translate(-50%, -50%);
+    background-color: #85c9b4;
+    padding: 20px;
+    border-radius: 5px;
+    display: none;
+    opacity: 0.8;
+  } 
+  
+ #notification-message {
+    color: #333;
+    font-size: 18px;
+  }

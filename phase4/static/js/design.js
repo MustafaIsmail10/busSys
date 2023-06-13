@@ -1,5 +1,26 @@
 let socket;
 
+
+
+
+function showNotification(message) {
+    var notificationBox = document.getElementById("notification-box");
+    var notificationMessage = document.getElementById("notification-message");
+
+    notificationMessage.innerText = message;
+    notificationBox.style.display = "block";
+
+    setTimeout(function () {
+        notificationBox.style.opacity = 1;
+    }, 100);
+
+    document.addEventListener('click', function (event) {
+        notificationBox.style.display = 'none';
+    });
+}
+
+
+
 function connectWebSocket() {
     socket = new WebSocket("ws://localhost:1445/ws");
     socket.onopen = function () {
@@ -25,13 +46,13 @@ function connectWebSocket() {
             });
             console.log(document.getElementById("options"));
             document.getElementById("options").style.display = "block";
-            
-        } 
-        // else if (msg.type == "notification") {
 
-        // } else {
-        
-        // }
+        }
+        else if (msg.type == "notification") {
+            showNotification(msg.result);
+        } else {
+
+        }
     };
 
     socket.onclose = function (event) {

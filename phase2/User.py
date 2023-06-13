@@ -108,7 +108,7 @@ class User:
                 self.wait_notification.wait()
 
             if self.kill_notification_thread:
-                self.kill_notification_thread = True
+                self.kill_notification_thread = False
                 return None
 
             new_messages = self.messages

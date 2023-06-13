@@ -182,7 +182,7 @@ class Server:
             notificatoins = user.get_notifications()
             
             with lst[1]:
-                if not lst[0]:
+                if not lst[0] :
                     print("Notification Thread is dead")
                     return
             if (notificatoins):
@@ -199,9 +199,8 @@ class Server:
                 "username": user.get_username(),
             }
             connection.send(json.dumps(response))
-            working = True
             mutex = RLock()
-            lst = [working, mutex]
+            lst = [True, mutex]
             notification_tread = Thread(
                 target=self.notif_handler, args=(connection, user, lst)
             )

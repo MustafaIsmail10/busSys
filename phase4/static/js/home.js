@@ -1,5 +1,27 @@
 let socket;
 
+
+
+
+function showNotification(message) {
+    console.log(message);
+    var notificationBox = document.getElementById("notification-box");
+    var notificationMessage = document.getElementById("notification-message");
+
+    notificationMessage.innerText = message;
+    notificationBox.style.display = "block";
+
+    setTimeout(function () {
+        notificationBox.style.opacity = 1;
+    }, 100);
+
+    document.addEventListener('click', function (event) {
+        notificationBox.style.display = 'none';
+    });
+}
+
+
+
 function connectWebSocket() {
     socket = new WebSocket("ws://localhost:1445/ws");
     socket.onopen = function () {
@@ -25,7 +47,7 @@ function connectWebSocket() {
                 localStorage.setItem("token", "");
             })
         } else if (msg.type == "notification") {
-
+            showNotification(msg.result);
         } else {
 
         }

@@ -2,9 +2,14 @@
 {% block content %}
 {% load static %}
 <link href="{% static 'css/design.css' %}" rel="stylesheet">
+
+
 <div id="options" style="display: none">
         
-  
+    <div id="notification-box">
+        <div id="notification-message">This is a notification message.</div>
+      </div>
+      
     <h2 class="heading"> Pick an action! </h2>
     <button onclick="window.location.href='/design/route/'"  class="buttons"> Route operations</button>
     
